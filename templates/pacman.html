@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>Aurora Store</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pacman.css') }}">
+</head>
+<body>
+<main>
+    <a href="/">Aur</a>
+    <h1>Aurora Store</h1>
+    <p>Pacotes do Arch e AUR, em uma interface só.</p>
+    <form class="inputPesquisa" action="/pacman/buscar" method="get">
+        <input type="search" name="q" placeholder="Buscar aplicativos…" autofocus required>
+        <button id="buscar">Buscar</button>
+    </form>
+    <section id="results"></section>
+
+    <h1>Resultado para: {{ termo }}</h1>
+
+    {% for pacote in pacotes %}
+        <form class="resultado" action="/pacman/instalar" method="post">
+            <article>
+                <h2>{{ pacote["pkgname"] }}</h2>
+                <p>{{ pacote["pkgdesc"] }}</p>
+                <small>Versão: {{ pacote["pkgver"] }}</small>
+            </article>
+
+            <input type="hidden" name="pacote" value="{{ pacote["pkgname"] }}">
+
+            <section>
+                {% if pacote["instalado"] %}
+                    <button type="submit" disabled> Instalado </button>
+                {% else %}
+                    <button type="submit"> Instalar </button>
+                {% endif %}
+            </section>
+        </form>
+    {% else %}
+        <p>Nenhum pacote encontrado.</p>
+    {% endfor %}
+</main>
+</body>
+</html>

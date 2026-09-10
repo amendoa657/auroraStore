@@ -1,0 +1,109 @@
+:root {
+    --outline: #0A5786;
+}
+
+* {
+    margin: 0;
+    box-sizing: border-box;
+    color: #072538;
+}
+
+body {
+    margin: 0;
+    background: #D0E1EB;
+    color: #f9fafb;
+    font-family: system-ui, sans-serif;
+}
+
+main {
+    max-width: 900px;
+    margin: 80px auto;
+    padding: 32px;
+}
+
+
+.inputPesquisa {
+    display: flex;
+    height: 6vh;
+}
+
+.inputPesquisa input {
+    width: 100%;
+    padding: 16px;
+    border: 0;
+    border-bottom-left-radius: 12px;
+    border-top-left-radius: 12px;
+    font-size: 16px;
+    flex: 9;
+    outline: none;
+    height: 100%;
+    border-bottom: 2px solid var(--outline);
+    border-top: 2px solid var(--outline);
+    border-left: 2px solid var(--outline);
+}
+
+#buscar {
+    height: 100%;
+    flex: 1;
+    display: block;
+    background-color: #DFC366;
+    outline: none;
+    border: none;
+
+    border-bottom-right-radius: 12px;
+    border-top-right-radius: 12px;
+
+    border-bottom: 2px solid var(--outline);
+    border-top: 2px solid var(--outline);
+    border-right: 2px solid var(--outline);
+}
+
+.package-card {
+    margin-top: 12px;
+    padding: 18px;
+    border: 1px solid #273244;
+    border-radius: 12px;
+    background: #182235;
+}
+
+.package-card h2 {
+    margin-top: 0;
+}
+
+.resultado  {
+    margin-top: 12px;
+    padding: 18px;
+    border: 1px solid #273244;
+    border-radius: 12px;
+    background: #182235;
+    display: flex;
+    justify-content: space-between;
+}
+
+.resultado h2 {
+    color: #DFC366;
+}
+
+.resultado button {
+    background-color: #DFC366;
+    height: 3vh;
+    flex: 1;
+    display: block;
+    outline: none;
+    border: none;
+    padding: 0 14px;
+    border-radius: 5px;
+}
+
+.resultado p {
+    color: #F8F8F8;
+}
+
+.resultado small {
+    color: #F8F8F8;
+}
+
+.resultado section {
+    display: flex;
+    align-items: flex-end;
+}
