@@ -41,7 +41,7 @@ instalados=buscarPacotesInstalados()
 numeroInstalados=contarLinhas(["pacman", "-Qq"])
 numeroAtualizacoes=contarLinhas(["pacman", "-Quq"])
 
-def criar_config_paru():
+def criarConfigParu():
     caminho = Path.home() / ".config" / "aurora-store" / "paru.conf"
 
     # Cria ~/.config/aurora-store caso ainda não exista.
@@ -99,7 +99,7 @@ def buscarAur():
 def instalarAur():
     pacote = request.form.get("pacote", "")
 
-    config_paru = criar_config_paru()
+    config_paru = criarConfigParu()
 
     ambiente = os.environ.copy()
     ambiente["PARU_CONF"] = str(config_paru)
@@ -121,6 +121,7 @@ def instalarAur():
 @app.get("/pacman")
 def getPacman():
     return render_template("pacman.html")
+
 @app.get("/pacman/buscar")
 def buscarPacman():
     termo = request.args.get("q", "").strip()
@@ -172,7 +173,7 @@ def instalarPacman():
     return f"Não foi possível instalar {pacote}.", 500
 
 if __name__ == "__main__":
-    config_paru = criar_config_paru()
+    config_paru = criarConfigParu()
 
     window = webview.create_window(
         "Aurora Store",
