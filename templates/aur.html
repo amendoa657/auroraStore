@@ -6,47 +6,77 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://unpkg.com/htmx.org@2.0.8"></script>
     <!-- Pesquisar sobre htmx pra fazer mudanca dinamica de paginas!!!-->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav>
+        <div class="logo">
+            <h1>Aurora</h1>
+            <h3>ARCH SOFTWARE</h3>
+        </div>
+        <div class="botoes">
+            <button>Inicio</button>
+            <button>Instalados</button>
+            <button>Atualizacoes</button>
+            <button>Configuracoes</button>
+        </div>
+        <div class="pesquisa">
+            <form class="inputPesquisa" action="/aur/buscar" method="get">
+                <input type="search" name="q" placeholder="Buscar aplicativos…" autofocus required>
+            </form>
+        </div>
+
+
+        <!--
         <h2>Pacotes Instalados: {{ numeroInstalados }}</h2>
         <h2>Pacotes Com Atualizacoes: {{ numeroAtualizacoes }}</h2>
+        -->
     </nav>
 
     <main>
 
-        <a href="/pacman">Pacman</a>
-        <h1>Aurora Store</h1>
-        <p>Pacotes do Arch e AUR, em uma interface só.</p>
-        <form class="inputPesquisa" action="/aur/buscar" method="get">
-            <input type="search" name="q" placeholder="Buscar aplicativos…" autofocus required>
-            <button id="buscar">Buscar</button>
-        </form>
-        <section id="results"></section>
+        <div class="seletorPacotes">
+            <div>
+                <input type="radio" name="gerenciador" value="pacman">
+                <label for="pacman">pacman</label>
+            </div>
 
-        <h1>Resultado para: {{ termo }}</h1>
+            <div>
+                <input type="radio" name="gerenciador" value="aur">
+                <label for="aur">aur</label>
+            </div>
+        </div>
 
-        {% for pacote in pacotes %}
-            <form class="resultado" action="/aur/instalar" method="post">
-                <article>
-                    <h2>{{ pacote["Name"] }}</h2>
-                    <p>{{ pacote["Description"] }}</p>
-                    <small>Versão: {{ pacote["Version"] }}</small>
-                </article>
+        <h1>Explorar Aplicativos</h1>
 
-                <input type="hidden" name="pacote" value="{{ pacote["Name"] }}">
 
-                <section>
-                    {% if pacote["instalado"] %}
-                        <button type="submit" disabled> Instalado </button>
-                    {% else %}
-                        <button type="submit"> Instalar </button>
-                    {% endif %}
-                </section>
-            </form>
-        {% else %}
-            <p>Nenhum pacote encontrado.</p>
-        {% endfor %}
+        <!-- <a href="/pacman">Pacman</a> -->
+        <div class="resultados">
+            {% for pacote in pacotes %}
+                <form class="resultado" action="/aur/instalar" method="post">
+                    <article>
+                        <h2>{{ pacote["Name"] }}</h2>
+                        <p>{{ pacote["Description"] }}</p>
+                        <small>Versão: {{ pacote["Version"] }}</small>
+                    </article>
+
+                    <input type="hidden" name="pacote" value="{{ pacote["Name"] }}">
+
+                    <section>
+                        {% if pacote["instalado"] %}
+                            <button type="submit" disabled> Instalado </button>
+                        {% else %}
+                            <button type="submit"> Instalar </button>
+                        {% endif %}
+                    </section>
+                </form>
+            {% else %}
+                <p>Nenhum pacote encontrado.</p>
+            {% endfor %}
+        </div>
     </main>
 </body>
 </html>

@@ -37,9 +37,12 @@ def buscarPacotesInstalados():
 
     return set(resultado.stdout.splitlines())
 
-instalados=buscarPacotesInstalados()
-numeroInstalados=contarLinhas(["pacman", "-Qq"])
-numeroAtualizacoes=contarLinhas(["pacman", "-Quq"])
+#instalados=buscarPacotesInstalados()
+instalados=None
+#numeroInstalados=contarLinhas(["pacman", "-Qq"])
+numeroInstalados=None
+#numeroAtualizacoes=contarLinhas(["pacman", "-Quq"])
+numeroAtualizacoes=None
 
 def criarConfigParu():
     caminho = Path.home() / ".config" / "aurora-store" / "paru.conf"
@@ -85,8 +88,8 @@ def buscarAur():
         )
     )
 
-    for pacote in pacotes:
-        pacote["instalado"] = pacote["Name"] in instalados
+    #for pacote in pacotes:
+    #    pacote["instalado"] = pacote["Name"] in instalados
 
     return render_template(
         "aur.html",
@@ -125,6 +128,8 @@ def getPacman():
 @app.get("/pacman/buscar")
 def buscarPacman():
     termo = request.args.get("q", "").strip()
+    page = request.args.get("page", "").strip()
+    limit = 50
 
     if not termo:
         return {"results": []}
@@ -145,8 +150,8 @@ def buscarPacman():
         )
     )
 
-    for pacote in pacotes:
-        pacote["instalado"] = pacote["pkgname"] in instalados
+    #for pacote in pacotes:
+    #    pacote["instalado"] = pacote["pkgname"] in instalados
 
     return render_template(
         "pacman.html",
@@ -182,4 +187,5 @@ if __name__ == "__main__":
         height=800,
         min_size=(900, 600),
     )
-    webview.start(debug=True)
+    app.run(debug=True)
+    #webview.start(debug=True)
