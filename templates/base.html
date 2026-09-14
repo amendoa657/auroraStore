@@ -1,0 +1,153 @@
+{#
+  Esqueleto da janela. Todas as telas herdam daqui.
+
+  O que o Python pode mandar (tudo opcional — o que faltar simplesmente não
+  aparece):
+
+    pagina       str   qual item do menu fica aceso: "descobrir", "buscar",
+                       "instalados", "atualizacoes", "fila", "configuracoes"
+    contagens    dict  {"instalados": 842, "atualizacoes": 7, "fila": 2}
+    fontes       list  [{"id": "aur", "rotulo": "aur", "ligada": True}, ...]
+    sincronizado str   "há 12 min · mirror br"
+    termo        str   preenche o campo de busca do cabeçalho
+#}
+<!DOCTYPE html>
+<html lang="pt-BR" class="{{ 'sem-animacoes' if prefs and not prefs.animacoes }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>{% block titulo %}Pacotes{% endblock %}</title>
+<link rel="icon" href="{{ url_for('static', filename='icone.svg') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+
+{# Paleta do usuário, salva em Configurações e aplicada por cima do tema.
+   É CSS colado por quem usa o programa, então vai cru mesmo (| safe). #}
+{% if paleta %}<style>{{ paleta | safe }}</style>{% endif %}
+
+{% block cabeca %}{% endblock %}
+</head>
+<body>
+
+<div class="janela">
+
+  {#
+    Cabeçalho. A tela pode trocar o miolo inteiro sobrescrevendo o bloco —
+    a página do pacote põe um "voltar" no lugar da marca, por exemplo.
+  #}
+  <header class="barra-cabecalho">
+    {% block cabecalho %}
+      <a class="marca" href="/"><i class="marca-glifo"></i><span>Pacotes</span></a>
+
+      <form class="busca-envolucro" action="/buscar" method="get" role="search">
+        <i class="lupa" aria-hidden="true"></i>
+        <input class="campo-busca" type="search" name="q" value="{{ termo or '' }}"
+               placeholder="Buscar pacotes" aria-label="Buscar pacotes" autocomplete="off">
+        <kbd class="atalho">/</kbd>
+      </form>
+    {% endblock %}
+
+    <button class="alternar-lateral" data-menu aria-label="Abrir menu"><i></i><i></i><i></i></button>
+    <div class="controles-janela" aria-hidden="true"><span></span><span></span><span></span></div>
+  </header>
+
+  <div class="corpo {% block classe_corpo %}{% endblock %}">
+
+    {% block lateral %}
+      <nav class="barra-lateral" aria-label="Navegação principal">
+        {% set menu = [
+          {"rotulo": "Descobrir",     "url": "/",              "id": "descobrir"},
+          {"rotulo": "Buscar",        "url": "/buscar",        "id": "buscar"},
+          {"rotulo": "Instalados",    "url": "/instalados",    "id": "instalados",    "contagem": contagens.instalados},
+          {"rotulo": "Atualizações",  "url": "/atualizacoes",  "id": "atualizacoes",  "selo": contagens.atualizacoes},
+          {"rotulo": "Fila",          "url": "/fila",          "id": "fila",          "contagem": contagens.fila},
+          {"rotulo": "Configurações", "url": "/configuracoes", "id": "configuracoes"}
+        ] %}
+
+        {% for item in menu %}
+          <a class="item-lateral {{ 'ativo' if pagina == item.id }}" href="{{ item.url }}"
+             {{ 'aria-current=page' if pagina == item.id }}>
+            <i class="ponto" aria-hidden="true"></i>
+            <span class="texto">{{ item.rotulo }}</span>
+            {% if item.contagem %}<span class="contagem">{{ item.contagem }}</span>{% endif %}
+            {% if item.selo %}<span class="selo-contagem">{{ item.selo }}</span>{% endif %}
+          </a>
+        {% endfor %}
+
+        {# Fontes de pacote. Cada uma é um botão que manda POST e o Python liga
+           ou desliga; sem fonte nenhuma, o bloco some. #}
+        {% if fontes %}
+          <div class="separador"></div>
+          <div class="rotulo-secao">FONTES</div>
+
+          {% for fonte in fontes %}
+            <form class="form-acao" method="post" action="/fontes">
+              <input type="hidden" name="fonte" value="{{ fonte.id }}">
+              <button class="fonte-repo {{ 'ligada' if fonte.ligada }}" aria-pressed="{{ 'true' if fonte.ligada else 'false' }}">
+                <span class="texto">{{ fonte.rotulo }}</span>
+                <span class="marca-check" aria-hidden="true">{{ '✓' if fonte.ligada }}</span>
+              </button>
+            </form>
+          {% endfor %}
+        {% endif %}
+
+        {% if sincronizado %}
+          <form class="form-acao" method="post" action="/sincronizar">
+            <button class="estado-sync" title="Sincronizar bancos de dados">
+              <div class="linha"><i class="pulso" aria-hidden="true"></i><span class="texto">sincronizado</span></div>
+              <div class="detalhe-sync">{{ sincronizado }}</div>
+            </button>
+          </form>
+        {% endif %}
+      </nav>
+    {% endblock %}
+
+    <main class="visualizacao {% block classe_conteudo %}{% endblock %}">
+      {% block conteudo %}{% endblock %}
+    </main>
+
+    {# Fundo escuro atrás da gaveta do menu em telas estreitas. #}
+    <div class="fundo-lateral" data-fechar-menu></div>
+  </div>
+
+  {% block estado %}
+    {% if contagens %}
+      <footer class="barra-estado">
+        <i class="pulso" aria-hidden="true"></i>
+        <span>bancos sincronizados {{ sincronizado }}</span>
+        <div class="direita">
+          <a class="vinculo-estado" href="/fila">{{ contagens.fila or 0 }} na fila</a>
+          <span>·</span>
+          <a class="vinculo-estado" href="/atualizacoes">{{ contagens.atualizacoes or 0 }} atualizações pendentes</a>
+        </div>
+      </footer>
+    {% endif %}
+  {% endblock %}
+
+</div>
+
+{#
+  Avisos vindos do Flask. No Python:  flash("Blender instalado", "ok")
+  As categorias viram a cor da bolinha: "ok", "alerta" ou nada.
+  Somem sozinhos por animação do CSS — não precisa de JavaScript.
+#}
+{% with mensagens = get_flashed_messages(with_categories=true) %}
+  {% if mensagens %}
+    <div class="pilha-avisos" role="status" aria-live="polite">
+      {% for categoria, mensagem in mensagens %}
+        <div class="aviso-flutuante aviso-{{ categoria or 'info' }}">
+          <i class="marcador" aria-hidden="true"></i>
+          <span>{{ mensagem }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

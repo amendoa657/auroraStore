@@ -1,0 +1,170 @@
+{#
+  Página de um pacote.
+
+    pacote  dict  os campos das macros, mais o que aparecer:
+                    sobre        str   texto longo
+                    mantenedor   str
+                    licenca      str
+                    votos        int   (AUR)
+                    atualizado   str   já formatado, ex.: "28/08/2026"
+                    download     str   ex.: "118 MiB"
+                    tamanho      str   ex.: "394 MiB"
+                    deps         list  nomes, ou {"nome": ..., "instalada": bool}
+                    capturas     list  URLs de imagens
+                    pkgbuild     str   o script inteiro (AUR)
+
+  A barra de progresso só aparece quando o pacote está na fila — o Python
+  preenche pacote.na_fila e pacote.progresso.
+#}
+{% extends "base.html" %}
+{% from "_macros.html" import botao, selo, icone %}
+
+{% set pagina = "pacote" %}
+{% block titulo %}{{ pacote.Name}} — Pacotes{% endblock %}
+
+{% block cabecalho %}
+  <a class="btn btn-voltar" href="/buscar">← Voltar</a>
+  <span class="meta meta-cabecalho">{{ pacote.fonte }} / {{ pacote.Name }}</span>
+{% endblock %}
+
+{# Esta tela ocupa a largura toda: sem barra lateral e sem rodapé. #}
+{% block classe_corpo %}sem-lateral{% endblock %}
+{% block lateral %}{% endblock %}
+{% block estado %}{% endblock %}
+{% block classe_conteudo %}detalhe{% endblock %}
+
+{% block conteudo %}
+
+  <div class="detalhe-principal">
+
+    <div class="detalhe-cabecalho">
+      {{ icone(pacote, "icone-78") }}
+      <div class="detalhe-identidade">
+        <div class="linha-titulo">
+          <h1>{{ pacote.Name }}</h1>
+          {{ selo(pacote) }}
+        </div>
+        <div class="subtitulo">
+          {{ pacote.Name }} {{ pacote.Version }}
+          {% if pacote.Maintainer %}· mantido por {{ pacote.Maintainer }}{% endif %}
+        </div>
+      </div>
+      <div class="acoes-detalhe">
+        {{ botao(pacote, grande=true, primario=true) }}
+      </div>
+    </div>
+
+    {% if pacote.fonte == "aur" %}
+      <section class="aviso">
+        <div class="aviso-icone" aria-hidden="true">!</div>
+        <div>
+          <h3>Pacote da AUR — enviado por usuários</h3>
+          <p>Não é revisado pelos mantenedores do Arch. O PKGBUILD roda na sua máquina
+             durante a compilação. Revise o script antes de continuar.</p>
+          {% if pacote.pkgbuild %}
+            <div class="acoes">
+              <button class="btn btn-destrutivo" data-abrir="pkgbuild">Ver PKGBUILD</button>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% if pacote.na_fila %}
+      <div class="faixa-progresso">
+        <div class="faixa-progresso-texto">
+          <strong>{{ pacote.passo or "na fila" }}</strong>
+          <span class="meta">{{ pacote.progresso or 0 }}%</span>
+        </div>
+        <div class="barra-progresso alta"><i style="width: {{ pacote.progresso or 0 }}%"></i></div>
+        <a class="btn" href="/fila">Ver fila</a>
+      </div>
+    {% endif %}
+
+    {% if pacote.Description %}
+      <section class="bloco">
+        <h2>Sobre</h2>
+        <p>{{ pacote.Description }}</p>
+      </section>
+    {% endif %}
+
+    {% if pacote.capturas %}
+      <div class="galeria">
+        {% for captura in pacote.capturas %}
+          <img class="captura-imagem" src="{{ captura }}" alt="Captura de tela de {{ pacote.nome }}" loading="lazy">
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  </div>
+
+  <aside class="painel-lateral">
+
+    <section>
+      <div class="rotulo-painel">DETALHES</div>
+      <div class="lista-dados" style="margin-top: 11px">
+        {% if pacote.NumVotes is not none %}
+          <div><span class="chave">Votos AUR</span><span class="valor">{{ pacote.NumVotes }}</span></div>
+        {% endif %}
+        {% if pacote.Popularity %}
+          <div><span class="chave">Popularidade</span><span class="valor">{{ pacote.Popularity }}</span></div>
+        {% endif %}
+        {% if pacote.atualizado %}
+          <div><span class="chave">Atualizado</span><span class="valor">{{ pacote.atualizado }}</span></div>
+        {% endif %}
+        {% if pacote.License %}
+          <div><span class="chave">Licença</span><span class="valor">{{ pacote.License }}</span></div>
+        {% endif %}
+        {% if pacote.URL %}
+          <div><span class="chave">Download</span><span class="valor">{{ pacote.URL }}</span></div>
+        {% endif %}
+        {% if pacote.tamanho %}
+          <div><span class="chave">Instalado</span><span class="valor">{{ pacote.tamanho }}</span></div>
+        {% endif %}
+      </div>
+    </section>
+
+    {% if pacote.Depends %}
+      <div class="separador" style="margin: 0"></div>
+      <section>
+        <div class="rotulo-painel">DEPENDÊNCIAS · {{ pacote.Depends | length }}</div>
+        <div class="nuvem-deps" style="margin-top: 9px">
+          {#  Aceita tanto uma lista de nomes quanto de dicts com "instalada". #}
+          {% for dep in pacote.Depends %}
+              <a class="dep" href="/buscar/{{ dep }}">{{ dep }}</a>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% if pkgBuild %}
+      <div class="separador" style="margin: 0"></div>
+      <section>
+        <div class="rotulo-painel">
+          <span>PKGBUILD</span>
+          <button class="vinculo-painel" data-abrir="pkgbuild">abrir</button>
+        </div>
+        <pre class="pkgbuild" style="margin: 9px 0 0">{{ pkgBuild.split("\n")[:5] | join("\n") }}
+…</pre>
+      </section>
+    {% endif %}
+
+  </aside>
+
+  {% if pkgBuild %}
+    <dialog class="dialogo" id="pkgbuild">
+      <header class="dialogo-cabecalho">
+        <h2>PKGBUILD</h2>
+        <span class="meta">{{ pacote.Name }} {{ pacote.Version }}</span>
+        <button class="btn btn-icone btn-fechar" data-fechar aria-label="Fechar">✕</button>
+      </header>
+      <div class="dialogo-corpo">
+        <pre class="pkgbuild pkgbuild-cheio">{{ pkgBuild }}</pre>
+      </div>
+      <footer class="dialogo-rodape">
+        <button class="btn btn-primario" data-fechar>Fechar</button>
+      </footer>
+    </dialog>
+  {% endif %}
+
+{% endblock %}

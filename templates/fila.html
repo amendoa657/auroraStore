@@ -1,0 +1,132 @@
+{#
+  Fila de instalação.
+
+    fila    list  [{"nome": "spotify", "situacao": "instalando",
+                    "progresso": 62, "passo": "compilando pacote · passo 3 de 5"}]
+                  situacao: "instalando" | "aguardando" | "concluido" | "erro"
+    saida   list  linhas do terminal, como o makepkg cospe.
+                  Linhas que começam com "==>" ganham destaque sozinhas.
+    resumo  dict  {"download": "214 MiB", "disco": "+612 MiB", "tempo": "~3 min"}
+
+  Como o progresso muda no servidor, a página se recarrega sozinha enquanto
+  houver algo instalando (veja o bloco `cabeca` logo abaixo).
+#}
+{% extends "base.html" %}
+{% from "_macros.html" import icone, vazio %}
+
+{% set pagina = "fila" %}
+{% set instalando = fila | selectattr("situacao", "equalto", "instalando") | list | length > 0 %}
+{% block titulo %}Fila de instalação — Pacotes{% endblock %}
+
+{% block cabeca %}
+  {% if instalando %}<meta http-equiv="refresh" content="2">{% endif %}
+{% endblock %}
+
+{% block cabecalho %}
+  <a class="marca" href="/"><i class="marca-glifo"></i><span>Fila de instalação</span></a>
+  <span class="meta meta-cabecalho">
+    {{ fila | selectattr("situacao", "equalto", "concluido") | list | length }} de {{ fila | length }} concluídos
+  </span>
+  <div class="espaco-cabecalho"></div>
+
+  {% if fila %}
+    <form class="form-acao" method="post" action="/cancelar-tudo">
+      <button class="btn btn-destrutivo">Cancelar tudo</button>
+    </form>
+  {% endif %}
+{% endblock %}
+
+{% block classe_corpo %}sem-lateral{% endblock %}
+{% block lateral %}{% endblock %}
+{% block estado %}{% endblock %}
+{% block classe_conteudo %}fila{% endblock %}
+
+{% block conteudo %}
+
+  <div class="coluna-fila">
+    {% for item in fila %}
+      <article class="cartao item-fila {{ 'concluido' if item.situacao == 'concluido' }}">
+        <div class="linha">
+          {% if item.situacao == "concluido" %}
+            <div class="icone-app icone-38 icone-ok" aria-hidden="true">✓</div>
+          {% else %}
+            {{ icone(item, "icone-38") }}
+          {% endif %}
+
+          <a class="info" href="/pacote/{{ item.nome }}">
+            <strong>{{ item.nome }}</strong>
+            {% if item.situacao == "instalando" %}
+              <span class="ativo">{{ item.passo or "instalando" }}</span>
+            {% elif item.situacao == "concluido" %}
+              <span class="pronto">{{ item.passo or "instalado" }}</span>
+            {% elif item.situacao == "erro" %}
+              <span class="falhou">{{ item.passo or "falhou" }}</span>
+            {% else %}
+              <span>aguardando na fila</span>
+            {% endif %}
+          </a>
+
+          {% if item.situacao == "instalando" %}
+            <div class="pct">{{ item.progresso or 0 }}%</div>
+          {% else %}
+            <form class="form-acao" method="post" action="/cancelar">
+              <input type="hidden" name="pacote" value="{{ item.nome }}">
+              <button class="btn btn-cancelar" aria-label="Tirar {{ item.nome }} da fila">✕</button>
+            </form>
+          {% endif %}
+        </div>
+
+        {% if item.situacao == "instalando" %}
+          <div class="barra-progresso alta"><i style="width: {{ item.progresso or 0 }}%"></i></div>
+        {% endif %}
+      </article>
+    {% else %}
+      {{ vazio("Fila vazia", "Nenhuma instalação em andamento.",
+               '<a class="btn btn-primario" href="/">Descobrir pacotes</a>') }}
+    {% endfor %}
+
+    {% if resumo %}
+      <div class="resumo-fila">
+        <div class="rotulo-painel">RESUMO</div>
+        <div class="lista-dados">
+          {% if resumo.download %}
+            <div><span class="chave">Download restante</span><span class="valor">{{ resumo.download }}</span></div>
+          {% endif %}
+          {% if resumo.disco %}
+            <div><span class="chave">Espaço em disco</span><span class="valor">{{ resumo.disco }}</span></div>
+          {% endif %}
+          {% if resumo.tempo %}
+            <div><span class="chave">Tempo restante</span><span class="valor">{{ resumo.tempo }}</span></div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="coluna-terminal">
+    <section class="terminal">
+      <div class="terminal-cabecalho">
+        <span class="rotulo">SAÍDA DO BUILD</span>
+        <span class="alvo">
+          {{ (fila | selectattr("situacao", "equalto", "instalando") | map(attribute="nome") | first) or "ocioso" }}
+        </span>
+      </div>
+
+      {# A saída rola sozinha até o fim: veja .terminal-saida no CSS. #}
+      <div class="terminal-saida">
+        {% for linha in saida %}
+          {% if linha.startswith("==>") %}
+            <div><span class="seta">==&gt;</span>{{ linha[3:] }}</div>
+          {% else %}
+            <div class="indent">{{ linha }}</div>
+          {% endif %}
+        {% else %}
+          <div class="terminal-ocioso">Sem build em andamento.</div>
+        {% endfor %}
+
+        {% if instalando %}<div class="linha-cursor"><i class="caret" aria-hidden="true"></i></div>{% endif %}
+      </div>
+    </section>
+  </div>
+
+{% endblock %}

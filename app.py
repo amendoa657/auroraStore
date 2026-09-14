@@ -1,12 +1,13 @@
 import os
 
 import requests
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory, abort
 import webview
 
 import re
 import shutil
 import subprocess
+
 
 from pathlib import Path
 app = Flask(__name__)
@@ -37,12 +38,25 @@ def buscarPacotesInstalados():
 
     return set(resultado.stdout.splitlines())
 
-#instalados=buscarPacotesInstalados()
-instalados=None
-#numeroInstalados=contarLinhas(["pacman", "-Qq"])
-numeroInstalados=None
-#numeroAtualizacoes=contarLinhas(["pacman", "-Quq"])
-numeroAtualizacoes=None
+
+instalados=buscarPacotesInstalados()
+#instalados=None
+numeroInstalados=contarLinhas(["pacman", "-Qq"])
+#numeroInstalados=None
+numeroAtualizacoes=contarLinhas(["pacman", "-Quq"])
+#numeroAtualizacoes=None
+
+fontes = [{"id": "aur", "rotulo": "aur", "ligada": True}]
+
+
+
+CONFIG_DIR = Path.home() / ".config" / "aurora-store"
+
+@app.route("/tema.css")
+def tema():
+    if not (CONFIG_DIR / "colors.css").is_file():
+        abort(404)
+    return send_from_directory(CONFIG_DIR, "colors.css", mimetype="text/css", max_age=0)
 
 def criarConfigParu():
     caminho = Path.home() / ".config" / "aurora-store" / "paru.conf"
@@ -59,18 +73,67 @@ def criarConfigParu():
 @app.get("/")
 def home():
     return render_template(
-        "aur.html",
-        numeroAtualizacoes=numeroAtualizacoes,
-        numeroInstalados=numeroInstalados
+        "descobrir.html",
+        contagens=None,
+        fontes=fontes
+    )
+
+@app.get("/configuracoes")
+def getConfiguracoes():
+    return render_template(
+        "configuracoes.html",
+        contagens=None,
+        fontes=fontes
+    )
+
+@app.get("/pacote/<nomePacote>")
+def getPacote(nomePacote):
+    return render_template(
+        "pacote.html",
+        contagens=None,
+        fontes=fontes,
+        nomePacote=nomePacote
+    )
+
+@app.get("/instalados")
+def getInstalados():
+    return render_template(
+        "pacote.html",
+        contagens=None,
+        fontes=fontes
     )
 
 
-@app.get("/aur/buscar")
+@app.get("/atualizacoes")
+def getAtualizacoes():
+    return render_template(
+        "atualizacoes.html",
+        contagens=None,
+        fontes=fontes
+    )
+
+@app.get("/fila")
+def getFila():
+    return render_template(
+        "fila.html",
+        contagens=None,
+        fontes=fontes
+    )
+
+
+@app.get("/buscar")
 def buscarAur():
     termo = request.args.get("q", "").strip()
 
     if not termo:
-        return {"results": []}
+        return render_template(
+            "buscar.html",
+            resultados=None,
+            contagens=None,
+            termo=termo,
+            fontes=fontes
+
+        )
 
     resposta = requests.get(
         "https://aur.archlinux.org/rpc/v5/search/" + termo,
@@ -78,9 +141,9 @@ def buscarAur():
     )
 
     dados = resposta.json()
-    pacotes = dados["results"]
+    resultados = dados["results"]
 
-    pacotes.sort(
+    resultados.sort(
         key=lambda pacote: (
             pacote["Name"].casefold() != termo.casefold(),
             not pacote["Name"].casefold().startswith(termo.casefold()),
@@ -92,18 +155,78 @@ def buscarAur():
     #    pacote["instalado"] = pacote["Name"] in instalados
 
     return render_template(
-        "aur.html",
-        pacotes=pacotes,
+        "buscar.html",
+        resultados=resultados,
+        contagens=None,
         termo=termo,
-        numeroAtualizacoes=numeroAtualizacoes,
-        numeroInstalados=numeroInstalados
+        fontes=fontes
+
     )
+
+@app.get("/buscar/<pacote>")
+def buscarPacoteAur(pacote):
+
+
+    resposta = requests.get(
+        "https://aur.archlinux.org/rpc/v5/info/" + pacote,
+        timeout=10,
+        )
+
+    dados = resposta.json()
+    resultado = dados["results"]
+
+    resposta = requests.get(
+        "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=" + pacote,
+        timeout=10,
+        )
+
+    pkgBuild = resposta.content.decode("utf-8")
+
+    if resultado:  # Verifica se a lista não está vazia
+        pacote = resultado[0]
+        pacote["fonte"] = "aur"
+
+
+    #for pacote in pacotes:
+    #    pacote["instalado"] = pacote["Name"] in instalados
+
+    return render_template(
+        "pacote.html",
+        pacote=pacote,
+        contagens=None,
+        fontes=fontes,
+        pkgBuild=pkgBuild
+    )
+
+@app.get("/buscar/<pacote>/pkgbuild")
+def buscarPkgBuild(pacote):
+
+
+    pkgBuild = requests.get(
+        "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=" + pacote,
+        timeout=10,
+        )
+
+
+
+
+    #for pacote in pacotes:
+    #    pacote["instalado"] = pacote["Name"] in instalados
+
+    return render_template(
+        "pacote.html",
+        pacote=pacote,
+        contagens=None,
+        fontes=fontes,
+        pkgBuild=pkgBuild
+    )
+
+
 @app.post("/aur/instalar")
 def instalarAur():
     pacote = request.form.get("pacote", "")
 
     config_paru = criarConfigParu()
-
     ambiente = os.environ.copy()
     ambiente["PARU_CONF"] = str(config_paru)
 
@@ -114,9 +237,9 @@ def instalarAur():
 
     if resultado.returncode == 0:
         return render_template(
-            "aur.html",
-            numeroAtualizacoes=numeroAtualizacoes,
-            numeroInstalados=numeroInstalados
+            "descobrir.html",
+            contagens=None,
+            fontes=fontes
         )
 
     return f"Não foi possível instalar {pacote}.", 500
@@ -187,5 +310,5 @@ if __name__ == "__main__":
         height=800,
         min_size=(900, 600),
     )
-    app.run(debug=True)
-    #webview.start(debug=True)
+    #app.run(debug=True)
+    webview.start(debug=True)

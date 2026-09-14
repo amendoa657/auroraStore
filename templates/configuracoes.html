@@ -1,0 +1,67 @@
+{#
+  Configurações. Um formulário só: tudo vai junto num POST /configuracoes.
+
+    prefs   dict  {"aviso_aur": True, "saida_terminal": True, "animacoes": True}
+    paleta  str   o bloco :root colado pelo usuário (a base.html aplica ele)
+
+  O checkbox marcado chega no Python como "on"; o desmarcado não chega. Em
+  Flask: request.form.get("aviso_aur") is not None.
+#}
+{% extends "base.html" %}
+
+{% set pagina = "configuracoes" %}
+{% block titulo %}Configurações — Pacotes{% endblock %}
+
+{% block conteudo %}
+
+  <form method="post" action="/configuracoes">
+
+    <section class="secao">
+      <div class="titulo-secao"><h2>Aparência</h2></div>
+      <div class="cartao bloco-config">
+        <p class="resumo">
+          Cole aqui o bloco <code class="mono">:root</code> gerado a partir do seu wallpaper.
+          Ele é aplicado por cima do tema, então só precisa conter o que mudar.
+        </p>
+        <textarea class="campo-paleta" name="paleta" rows="10" spellcheck="false"
+                  placeholder=":root {&#10;  --corDestaque: #86d7ac;&#10;  --corFundoJanela: #14121a;&#10;}">{{ paleta or '' }}</textarea>
+      </div>
+    </section>
+
+    <section class="secao">
+      <div class="titulo-secao"><h2>Comportamento</h2></div>
+      <div class="cartao bloco-config">
+
+        {% set opcoes = [
+          ("aviso_aur", "Avisar sobre pacotes da AUR",
+           "Mostra o alerta de PKGBUILD não revisado na página do pacote."),
+          ("saida_terminal", "Mostrar saída do terminal",
+           "Na fila, exibe o log do build em vez do progresso simplificado."),
+          ("animacoes", "Animações",
+           "Transições e entradas escalonadas pela loja inteira.")
+        ] %}
+
+        {% for chave, rotulo, descricao in opcoes %}
+          <label class="linha-config">
+            <div class="linha-config-texto">
+              <strong>{{ rotulo }}</strong>
+              <span>{{ descricao }}</span>
+            </div>
+            <span class="interruptor">
+              <input type="checkbox" class="interruptor-entrada" name="{{ chave }}"
+                     {{ "checked" if prefs[chave] }}>
+              <i aria-hidden="true"></i>
+            </span>
+          </label>
+        {% endfor %}
+
+      </div>
+    </section>
+
+    <div class="secao">
+      <button class="btn btn-primario btn-g">Salvar configurações</button>
+    </div>
+
+  </form>
+
+{% endblock %}

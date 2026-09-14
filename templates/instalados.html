@@ -1,0 +1,59 @@
+{#
+  Pacotes instalados.
+
+    pacotes  list  os pacotes do sistema
+    fonte    str   filtro ativo: "" | "oficiais" | "aur" | "atualizaveis"
+    espaco   str   já formatado, ex.: "3,2 GiB"
+    termo    str   filtro digitado, volta preenchido no campo do cabeçalho
+#}
+{% extends "base.html" %}
+{% from "_macros.html" import botao, selo, vazio %}
+
+{% set pagina = "instalados" %}
+{% block titulo %}Instalados — Pacotes{% endblock %}
+{% block classe_conteudo %}pilha{% endblock %}
+
+{% block conteudo %}
+
+  <div class="barra-filtros">
+    <span class="contagem-resultados">
+      {{ pacotes | length }} pacotes{% if espaco %} · {{ espaco }}{% endif %}
+    </span>
+
+    {% for id, rotulo in [("", "Todos"), ("oficiais", "Oficiais"), ("aur", "AUR"), ("atualizaveis", "Com atualização")] %}
+      <a class="chip {{ 'ativo' if fonte == id or (not fonte and not id) }}"
+         href="/instalados?fonte={{ id }}">{{ rotulo }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="tabela">
+    <div class="linha-pacote linha-instalado cabecalho-tabela">
+      <div>PACOTE</div>
+      <div class="col-versao">VERSÃO</div>
+      <div class="col-fonte">FONTE</div>
+      <div class="col-versao">TAMANHO</div>
+      <div></div>
+    </div>
+
+    {% for pacote in pacotes %}
+      <div class="linha-pacote linha-instalado">
+        <a class="nome-pacote" href="/pacote/{{ pacote.nome }}">
+          <strong>{{ pacote.nome }}</strong>
+          <span>{{ pacote.descricao }}</span>
+        </a>
+        <div class="col-versao">
+          <span>{{ pacote.versao }}</span>
+          {% if pacote.nova_versao %}
+            <span class="selo selo-destaque">→ {{ pacote.nova_versao }}</span>
+          {% endif %}
+        </div>
+        <div class="col-fonte">{{ selo(pacote) }}</div>
+        <div class="col-versao">{{ pacote.tamanho }}</div>
+        <div class="col-acao">{{ botao(pacote) }}</div>
+      </div>
+    {% else %}
+      {{ vazio("Nada por aqui", "Nenhum pacote instalado corresponde ao filtro.") }}
+    {% endfor %}
+  </div>
+
+{% endblock %}

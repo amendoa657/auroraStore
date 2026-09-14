@@ -1,0 +1,130 @@
+{#
+  Pedaços de HTML reaproveitados pelas telas.
+
+  Use com:  {% from "_macros.html" import cartao, linha, botao, selo %}
+
+  Todas as macros recebem um pacote — um dict (ou objeto) que o Python monta
+  a partir da AUR ou do pacman. Só `nome` é obrigatório; o resto some sozinho
+  se você não passar:
+
+    nome          str   nome real do pacote ("visual-studio-code-bin")
+    titulo        str   nome bonito ("Visual Studio Code"); cai pro nome
+    versao        str   "1.103.2-1"
+    descricao     str   uma linha
+    fonte         str   "core" | "extra" | "multilib" | "aur"
+    instalado     bool
+    nova_versao   str   preenchido só quando há atualização pendente
+    popularidade  int   0 a 100, usado na barrinha da busca
+    na_fila       str   "aguardando" | "instalando" (vazio se não está na fila)
+    progresso     int   0 a 100, quando está instalando
+#}
+
+{# Etiqueta da fonte: a AUR ganha a cor de alerta, o resto a cor calma. #}
+{% macro selo(pacote) %}
+  {% if pacote.fonte == "aur" %}
+    <span class="selo selo-aur">AUR</span>
+  {% elif pacote.fonte %}
+    <span class="selo selo-oficial">{{ pacote.fonte }}</span>
+  {% endif %}
+{% endmacro %}
+
+
+{# Quadradinho no lugar do ícone do app: a inicial sobre a trama listrada.
+   Troque por <img src="..."> quando tiver ícones de verdade. #}
+{% macro icone(pacote, tamanho="icone-42") %}
+  <div class="icone-app {{ tamanho }}" aria-hidden="true">
+    {{ (pacote.titulo or pacote.Name)[0] | upper }}
+  </div>
+{% endmacro %}
+
+
+{#
+  Botão de ação. O texto muda sozinho conforme o estado do pacote:
+
+    na fila      -> "Na fila" / "Instalando 62%", desabilitado
+    atualizável  -> "Atualizar", manda POST /atualizar
+    instalado    -> "Instalado", vira "Remover" no hover, manda POST /remover
+    o resto      -> "Instalar", manda POST /instalar
+
+  Cada botão é um formulário: quem decide o que fazer é o Python.
+#}
+{% macro botao(pacote, grande=false, primario=false) %}
+  {% set tamanho = " btn-g" if grande else "" %}
+
+  {% if pacote.na_fila %}
+    <button class="btn btn-ocupado{{ tamanho }}" style="--progresso: {{ pacote.progresso or 0 }}%" disabled>
+      {% if pacote.na_fila == "instalando" %}Instalando {{ pacote.progresso or 0 }}%{% else %}Na fila{% endif %}
+    </button>
+
+  {% elif pacote.nova_versao %}
+    <form class="form-acao" method="post" action="/atualizar">
+      <input type="hidden" name="pacote" value="{{ pacote.nome }}">
+      <button class="btn btn-primario{{ tamanho }}">Atualizar</button>
+    </form>
+
+  {% elif pacote.instalado %}
+    <form class="form-acao" method="post" action="/remover">
+      <input type="hidden" name="pacote" value="{{ pacote.Name }}">
+      <button class="btn btn-sucesso btn-instalado{{ tamanho }}" title="Remover {{ pacote.Name }}">
+        <span class="rotulo-padrao">Instalado</span>
+        <span class="rotulo-hover">Remover</span>
+      </button>
+    </form>
+
+  {% else %}
+    <form class="form-acao" method="post" action="/aur/instalar">
+      <input type="hidden" name="pacote" value="{{ pacote.Name }}">
+      <button class="btn{{ " btn-primario" if primario else "" }}{{ tamanho }}">Instalar</button>
+    </form>
+  {% endif %}
+{% endmacro %}
+
+
+{# Cartão para as grades de Descobrir. #}
+{% macro cartao(pacote) %}
+  <article class="cartao cartao-app">
+    <a class="cartao-topo" href="/pacote/{{ pacote.nome }}">
+      {{ icone(pacote) }}
+      <div class="cartao-identidade">
+        <h3>{{ pacote.titulo or pacote.nome }}</h3>
+        <div class="versao">{{ pacote.versao }}</div>
+      </div>
+    </a>
+    <p class="resumo">{{ pacote.descricao }}</p>
+    <div class="cartao-rodape">
+      {{ selo(pacote) }}
+      {{ botao(pacote) }}
+    </div>
+  </article>
+{% endmacro %}
+
+
+{# Linha para as listas de Buscar e Instalados. #}
+{% macro linha(pacote, mostrar_popularidade=true) %}
+  <div class="linha-pacote">
+    <a class="nome-pacote" href="/pacote/{{ pacote.nome }}">
+      <strong>{{ pacote.nome }}</strong>
+      <span>{{ pacote.descricao }}</span>
+    </a>
+    <div class="col-versao">{{ pacote.versao }}</div>
+    <div class="col-fonte">{{ selo(pacote) }}</div>
+    {% if mostrar_popularidade %}
+      <div class="col-pop">
+        <div class="barra-progresso"><i style="width: {{ pacote.popularidade or 0 }}%"></i></div>
+        <span>{{ pacote.popularidade or 0 }}</span>
+      </div>
+    {% endif %}
+    <div class="col-acao">{{ botao(pacote) }}</div>
+  </div>
+{% endmacro %}
+
+
+{# Tela sem nada: usada quando uma busca não acha nada, a fila está vazia etc. #}
+{% macro vazio(titulo, descricao, botao_html="") %}
+  <div class="estado-vazio">
+    <div class="glifo-vazio" aria-hidden="true"></div>
+    <h3>{{ titulo }}</h3>
+    <p>{{ descricao }}</p>
+    {{ botao_html | safe }}
+  </div>
+{% endmacro %}

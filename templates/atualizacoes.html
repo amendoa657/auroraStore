@@ -1,0 +1,67 @@
+{#
+  Atualizações pendentes.
+
+    pacotes         list  precisam ter versao e nova_versao
+    total_download  str   já formatado, ex.: "393 MiB"
+#}
+{% extends "base.html" %}
+{% from "_macros.html" import botao, vazio %}
+
+{% set pagina = "atualizacoes" %}
+{% block titulo %}Atualizações — Pacotes{% endblock %}
+{% block classe_conteudo %}pilha{% endblock %}
+
+{% block conteudo %}
+
+  <div class="barra-filtros">
+    <span class="contagem-resultados">
+      {% if pacotes %}
+        {{ pacotes | length }} {{ "atualizações" if pacotes | length > 1 else "atualização" }}
+        {%- if total_download %} · {{ total_download }} para baixar{% endif %}
+      {% else %}
+        tudo atualizado
+      {% endif %}
+    </span>
+
+    <div class="ordenacao">
+      <form class="form-acao" method="post" action="/sincronizar">
+        <button class="btn">Verificar agora</button>
+      </form>
+      {% if pacotes %}
+        <form class="form-acao" method="post" action="/atualizar-tudo">
+          <button class="btn btn-primario">Atualizar tudo</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="tabela">
+    {% if pacotes %}
+      <div class="linha-pacote linha-atualizacao cabecalho-tabela">
+        <div>PACOTE</div>
+        <div class="col-versao">ATUAL</div>
+        <div class="col-versao">NOVA</div>
+        <div class="col-versao">DOWNLOAD</div>
+        <div></div>
+      </div>
+
+      {% for pacote in pacotes %}
+        <div class="linha-pacote linha-atualizacao">
+          <a class="nome-pacote" href="/pacote/{{ pacote.nome }}">
+            <strong>{{ pacote.nome }}</strong>
+            <span>{{ pacote.descricao }}</span>
+          </a>
+          <div class="col-versao versao-antiga">{{ pacote.versao }}</div>
+          <div class="col-versao versao-nova">{{ pacote.nova_versao }}</div>
+          <div class="col-versao">{{ pacote.download }}</div>
+          <div class="col-acao">{{ botao(pacote) }}</div>
+        </div>
+      {% endfor %}
+
+    {% else %}
+      {{ vazio("Sistema em dia", "Nenhuma atualização pendente nas fontes ativas.",
+               '<a class="btn" href="/">Voltar a descobrir</a>') }}
+    {% endif %}
+  </div>
+
+{% endblock %}

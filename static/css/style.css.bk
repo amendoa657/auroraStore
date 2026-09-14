@@ -1,21 +1,18 @@
-@import "colors.css";
+@import url("/tema.css");
 
-:root {
-    --outline: #0A5786;
-}
 
 * {
     margin: 0;
     box-sizing: border-box;
-    color: var(--corTextoDestrutivo)
 }
 
 body {
     margin: 0;
     background-color: var(--corFundoBarraCabecalho);
-    color: #f9fafb;
+    color: var(--corTextoDestrutivo);
     font-family: 'Geist', sans-serif;
     line-height: 1.3;
+    #background: #111827 !important;
 }
 
 main {

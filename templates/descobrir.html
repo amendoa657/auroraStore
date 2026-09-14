@@ -1,0 +1,87 @@
+{#
+  Tela inicial.
+
+    destaque    pacote   o cartão grande do topo (opcional)
+    populares   list     pacotes das grades
+    categorias  list     [{"id": "jogos", "nome": "Jogos", "total": 612, "cor": "var(--corDestaque)"}]
+#}
+{% extends "base.html" %}
+{% from "_macros.html" import cartao, botao, selo, icone, vazio %}
+
+{% set pagina = "descobrir" %}
+{% block titulo %}Descobrir — Pacotes{% endblock %}
+
+{% block conteudo %}
+
+  {% if destaque %}
+    <section class="secao">
+      <article class="destaque">
+        {{ icone(destaque, "icone-100") }}
+        <div class="destaque-texto">
+          <div class="sobretitulo">EM DESTAQUE</div>
+          <h1>{{ destaque.titulo or destaque.nome }}</h1>
+          <p>{{ destaque.descricao }}</p>
+          <div class="destaque-acoes">
+            {{ botao(destaque, grande=true, primario=true) }}
+            {{ selo(destaque) }}
+            <span class="meta">{{ destaque.versao }}</span>
+            <a class="vinculo-detalhe" href="/pacote/{{ destaque.nome }}">Ver detalhes →</a>
+          </div>
+        </div>
+      </article>
+    </section>
+  {% endif %}
+
+  {% if contagens.atualizacoes %}
+    <section class="secao">
+      <div class="faixa-atualizacoes">
+        <div class="faixa-texto">
+          <strong>
+            {{ contagens.atualizacoes }}
+            {{ "atualizações disponíveis" if contagens.atualizacoes > 1 else "atualização disponível" }}
+          </strong>
+        </div>
+        <div class="faixa-acoes">
+          <a class="btn" href="/atualizacoes">Revisar</a>
+          <form class="form-acao" method="post" action="/atualizar-tudo">
+            <button class="btn btn-primario">Atualizar tudo</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="secao">
+    <div class="titulo-secao">
+      <h2>Populares esta semana</h2>
+      <a href="/buscar">Ver tudo</a>
+    </div>
+
+    <div class="grade-cartoes">
+      {% for pacote in populares %}
+        {{ cartao(pacote) }}
+      {% else %}
+        {{ vazio("Nada para mostrar ainda", "Nenhum pacote chegou do servidor.") }}
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if categorias %}
+    <section class="secao">
+      <div class="titulo-secao"><h2>Categorias</h2></div>
+
+      <div class="grade-cartoes">
+        {% for categoria in categorias %}
+          <a class="cartao cartao-categoria" href="/buscar?categoria={{ categoria.id }}">
+            <i class="barra-categoria" style="background: {{ categoria.cor or 'var(--corDestaque)' }}"></i>
+            <div>
+              <h3>{{ categoria.nome }}</h3>
+              <div class="versao">{{ categoria.total }} pacotes</div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+{% endblock %}
