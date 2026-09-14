@@ -19,13 +19,13 @@
         {{ icone(destaque, "icone-100") }}
         <div class="destaque-texto">
           <div class="sobretitulo">EM DESTAQUE</div>
-          <h1>{{ destaque.titulo or destaque.nome }}</h1>
-          <p>{{ destaque.descricao }}</p>
+          <h1>{{ destaque.titulo or destaque.Name }}</h1>
+          <p>{{ destaque.Description }}</p>
           <div class="destaque-acoes">
             {{ botao(destaque, grande=true, primario=true) }}
             {{ selo(destaque) }}
-            <span class="meta">{{ destaque.versao }}</span>
-            <a class="vinculo-detalhe" href="/pacote/{{ destaque.nome }}">Ver detalhes →</a>
+            <span class="meta">{{ destaque.Version }}</span>
+            <a class="vinculo-detalhe" href="/buscar/{{ destaque.Name }}">Ver detalhes →</a>
           </div>
         </div>
       </article>
