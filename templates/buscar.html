@@ -1,13 +1,16 @@
 {#
-  Busca — versão simples.
+  Busca — versão simples, com dois modos.
 
-  Só duas variáveis:
+  Variáveis:
 
     termo       str   o que foi digitado, para devolver ao campo
     resultados  list  os pacotes achados
+    modo        str   "aur" (padrão) ou "pacman" — só decide qual botão fica
+                      aceso e qual selo aparece na coluna FONTE
 
-  Cada pacote da lista precisa de `nome`; se tiver `descricao`, `versao` e
-  `fonte`, eles aparecem também.
+  Os campos dos pacotes são lidos nos dois jeitos, então dá para jogar aqui a
+  resposta crua da AUR (Name, Version, Description) ou os objetos do pyalpm
+  (name, version, desc) sem converter nada por enquanto.
 
   A tela tem duas caras e quem decide é o `termo`:
     sem termo  -> barra grande no meio da tela, nada embaixo
@@ -16,93 +19,119 @@
 {% extends "base.html" %}
 
 {% set pagina = "buscar" %}
+{% set modo = modo or "aur" %}
 {% block titulo %}Buscar — Pacotes{% endblock %}
 
-{# Sem as colunas de popularidade e de botão, a linha só precisa de três. #}
 {% block cabeca %}
-  <style>
-    .linha-pacote { grid-template-columns: minmax(0, 1fr) 112px 92px; }
-    @media (max-width: 720px) {
-      .linha-pacote { grid-template-columns: minmax(0, 1fr); }
-    }
-  </style>
+    <style>
+        /* Sem as colunas de popularidade e de botão, a linha só precisa de três. */
+        .linha-pacote { grid-template-columns: minmax(0, 1fr) 112px 92px; }
+        @media (max-width: 720px) {
+            .linha-pacote { grid-template-columns: minmax(0, 1fr); }
+        }
+        /* Os dois modos ficam embaixo do campo, visíveis antes e depois de buscar. */
+        .modos-busca { display: flex; gap: 7px; justify-content: center; margin-top: 12px; }
+    </style>
 {% endblock %}
 
 {# O cabeçalho da janela fica sem campo de busca: o campo grande já está na tela. #}
 {% block cabecalho %}
-  <a class="marca" href="/"><i class="marca-glifo"></i><span>Pacotes</span></a>
+    <a class="marca" href="/"><i class="marca-glifo"></i><span>Pacotes</span></a>
 {% endblock %}
 
 {% block classe_conteudo %}pilha pilha-busca{% endblock %}
 
 {% block conteudo %}
 
-  <div class="busca-central {{ 'compacta' if termo }}">
+    <div class="busca-central {{ 'compacta' if termo }}">
 
-    <div class="marca-busca">
-      <div class="glifo-grande" aria-hidden="true"></div>
-      <h1>Pacotes</h1>
-      <p>core, extra, multilib e AUR em um só lugar</p>
+        <div class="marca-busca">
+            <div class="glifo-grande" aria-hidden="true"></div>
+            <h1>Pacotes</h1>
+            <p>core, extra, multilib e AUR em um só lugar</p>
+        </div>
+
+        {# Formulário GET: apertar Enter leva para /buscar?q=o-que-foi-digitado
+       O modo vai junto num campo escondido, senão buscar de novo voltaria
+       sempre para a AUR. #}
+        <form class="campo-central-envolucro" action="/buscar" method="get" role="search">
+            <i class="lupa" aria-hidden="true"></i>
+            <input type="hidden" name="modo" value="{{ modo }}">
+            <input class="campo-central" type="search" name="q" value="{{ termo or '' }}"
+                   placeholder="Buscar pacotes" aria-label="Buscar pacotes"
+                   autocomplete="off" spellcheck="false" autofocus>
+            {% if termo %}
+                <a class="btn-limpar" href="/buscar?modo={{ modo }}" aria-label="Limpar busca">✕</a>
+            {% endif %}
+        </form>
+
+        {# Trocar de modo é só recarregar a mesma busca com ?modo= diferente. #}
+        <div class="modos-busca">
+            <a class="chip {{ 'ativo' if modo == 'aur' }}"
+               href="/buscar?q={{ termo | urlencode }}&modo=aur">AUR</a>
+            <a class="chip {{ 'ativo' if modo == 'pacman' }}"
+               href="/buscar?q={{ termo | urlencode }}&modo=pacman">Repositorios Oficiais</a>
+        </div>
+
     </div>
 
-    {# Formulário GET: apertar Enter leva para /buscar?q=o-que-foi-digitado #}
-    <form class="campo-central-envolucro" action="/buscar" method="get" role="search">
-      <i class="lupa" aria-hidden="true"></i>
-      <input class="campo-central" type="search" name="q" value="{{ termo or '' }}"
-             placeholder="Buscar pacotes" aria-label="Buscar pacotes"
-             autocomplete="off" spellcheck="false" autofocus>
-      {% if termo %}
-        <a class="btn-limpar" href="/buscar" aria-label="Limpar busca">✕</a>
-      {% endif %}
-    </form>
+    {% if termo %}
 
-  </div>
-
-  {% if termo %}
-
-    <div class="barra-filtros">
+        <div class="barra-filtros">
       <span class="contagem-resultados">
         {{ resultados | length }} {{ "resultado" if resultados | length == 1 else "resultados" }}
+        {{ "na AUR" if modo == "aur" else "nos repositórios" }}
       </span>
-    </div>
-
-    <div class="tabela">
-
-      <div class="linha-pacote cabecalho-tabela">
-        <div>PACOTE</div>
-        <div class="col-versao">VERSÃO</div>
-        <div class="col-fonte">FONTE</div>
-      </div>
-
-      {% for pacote in resultados %}
-        <div class="linha-pacote">
-          <a class="nome-pacote" href="/buscar/{{ pacote.Name }}">
-            <strong>{{ pacote.Name }}</strong>
-            <span>{{ pacote.Description }}</span>
-          </a>
-
-          <div class="col-versao">{{ pacote.Version }}</div>
-
-          <div class="col-fonte">
-            {% if pacote.fonte == "aur" %}
-              <span class="selo selo-aur">AUR</span>
-            {% elif pacote.fonte %}
-              <span class="selo selo-oficial">{{ pacote.fonte }}</span>
-            {% endif %}
-          </div>
         </div>
 
-      {# O else de um for roda quando a lista está vazia. #}
-      {% else %}
-        <div class="estado-vazio">
-          <div class="glifo-vazio" aria-hidden="true"></div>
-          <h3>Nenhum pacote encontrado</h3>
-          <p>Nada corresponde a “{{ termo }}”.</p>
+        <div class="tabela">
+
+            <div class="linha-pacote cabecalho-tabela">
+                <div>PACOTE</div>
+                <div class="col-versao">VERSÃO</div>
+                <div class="col-fonte">FONTE</div>
+            </div>
+
+            {% for pacote in resultados %}
+                {# Lê os dois formatos: Name/Description/Version da AUR ou
+           name/desc/version do pyalpm. #}
+                {% set nome = pacote.Name or pacote.name %}
+                {% set descricao = pacote.Description or pacote.desc %}
+                {% set versao = pacote.Version or pacote.version %}
+
+                <div class="linha-pacote">
+                    <a class="nome-pacote" href="/buscar/{{ nome }}?q={{ termo | urlencode }}&modo={{ modo }}">
+                        <strong>{{ nome }}</strong>
+                        <span>{{ descricao }}</span>
+                    </a>
+
+                    <div class="col-versao">{{ versao }}</div>
+
+                    <div class="col-fonte">
+                        {% if modo == "pacman" %}
+                            {# pyalpm sabe de que repositório o pacote veio: pkg.db.name.
+                 O `if pacote.db` evita erro quando o item é um dict sem db. #}
+                            <span class="selo selo-oficial">{{ pacote.fonte or (pacote.db.name if pacote.db else "") or "repo" }}</span>
+                        {% else %}
+                            <span class="selo selo-aur">AUR</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# O else de um for roda quando a lista está vazia. #}
+            {% else %}
+                <div class="estado-vazio">
+                    <div class="glifo-vazio" aria-hidden="true"></div>
+                    <h3>Nenhum pacote encontrado</h3>
+                    <p>Nada corresponde a “{{ termo }}” {{ "na AUR" if modo == "aur" else "nos repositórios oficiais" }}.</p>
+                    <a class="btn" href="/buscar?q={{ termo | urlencode }}&modo={{ 'pacman' if modo == 'aur' else 'aur' }}">
+                        Procurar {{ "nos repositórios" if modo == "aur" else "na AUR" }}
+                    </a>
+                </div>
+            {% endfor %}
+
         </div>
-      {% endfor %}
 
-    </div>
-
-  {% endif %}
+    {% endif %}
 
 {% endblock %}

@@ -124,6 +124,7 @@ def getFila():
 @app.get("/buscar")
 def buscarAur():
     termo = request.args.get("q", "").strip()
+    modo = request.args.get("modo", "").strip()
 
     if not termo:
         return render_template(
@@ -131,7 +132,8 @@ def buscarAur():
             resultados=None,
             contagens=None,
             termo=termo,
-            fontes=fontes
+            fontes=fontes,
+            modo=modo
 
         )
 
@@ -159,7 +161,8 @@ def buscarAur():
         resultados=resultados,
         contagens=None,
         termo=termo,
-        fontes=fontes
+        fontes=fontes,
+        modo=modo
 
     )
 
