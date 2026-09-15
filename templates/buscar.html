@@ -100,7 +100,7 @@
                 {% set versao = pacote.Version or pacote.version %}
 
                 <div class="linha-pacote">
-                    <a class="nome-pacote" href="/buscar/{{ nome }}?q={{ termo | urlencode }}&modo={{ modo }}">
+                    <a class="nome-pacote" href="/buscar/{{ nome }}?q={{ termo | urlencode }}&modo={{ modo }}&pagina=buscar">
                         <strong>{{ nome }}</strong>
                         <span>{{ descricao }}</span>
                     </a>

@@ -1,0 +1,23 @@
+
+/* Derivadas — todas calculadas a partir das variáveis acima, nenhuma cor nova.
+   Os níveis de texto respeitam contraste mínimo de 4.5:1 sobre as superfícies. */
+:root {
+  --corTextoSecundario: color-mix(in srgb, var(--corTextoJanela) 78%, transparent);
+  --corTextoTerciario:  color-mix(in srgb, var(--corTextoJanela) 66%, transparent);
+  --corSeparador:       color-mix(in srgb, var(--corTextoJanela) 10%, transparent);
+  --corDecorativa:      color-mix(in srgb, var(--corTextoJanela) 26%, transparent);
+  --corFocoContorno:    var(--corDestaque);
+
+  --corFundoDestaqueSuave:   color-mix(in srgb, var(--corDestaque) 16%, transparent);
+  --corFundoDestrutivoSuave: color-mix(in srgb, var(--corFundoDestrutivo) 42%, transparent);
+  --corPlaceholderA: color-mix(in srgb, var(--corTextoJanela) 12%, var(--corFundoCartao));
+  --corPlaceholderB: color-mix(in srgb, var(--corTextoJanela) 5%, var(--corFundoCartao));
+
+  --fonteUi: "Space Grotesk", system-ui, sans-serif;
+  --fonteMono: "JetBrains Mono", ui-monospace, monospace;
+
+  --raio-p: 7px;
+  --raio-m: 9px;
+  --raio-g: 12px;
+  --raio-xg: 18px;
+}

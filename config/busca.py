@@ -1,0 +1,3 @@
+busca = {
+    "ultimaPesquisa": ""
+}

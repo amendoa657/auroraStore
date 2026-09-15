@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, send_from_directory, abort, Blueprint
-from utils.fontes import fontes
+from flask import render_template, Blueprint
 
-from services.init.config import getTema
-from services.system.pacotesService import getDestaques
+from config.fontes import fontes
+from config.tema import getTema
 
-from repositories.pacotesRepository import buscarPopulares
+import services.pacotesService as s
+import system.downloadQueue as q
 
 pageBp = Blueprint("pageBp", __name__)
 @pageBp.get("/")
@@ -13,8 +13,8 @@ def home():
         "descobrir.html",
         contagens=None,
         fontes=fontes,
-        populares=buscarPopulares(),
-        destaque=getDestaques()
+        populares=s.buscarPopulares(),
+        destaque=s.buscarDestaques()
     )
 
 @pageBp.get("/configuracoes")
@@ -48,8 +48,11 @@ def getFila():
     return render_template(
         "fila.html",
         contagens=None,
-        fontes=fontes
+        fontes=fontes,
+        fila=list(q.statusDownloads.values()),
+        saida=q.terminal
     )
+
 
 @pageBp.route("/tema.css")
 def temaCss():

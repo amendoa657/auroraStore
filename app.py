@@ -6,9 +6,15 @@ from controllers.aurController import aurBp
 from controllers.systemController import systemBp
 from controllers.pacmanController import pacmanBp
 
-from services.init.paru import criarConfigParu
+from config.paru import criarConfigParu
+from system.downloadQueue import trabalhador
+from system.downloadQueue import filaDeDownloads
 
 app = Flask(__name__)
+app.secret_key = "chave-secreta-paru-gui"
+app.config["ULTIMA_PESQUISA"] = ""
+
+trabalhador.start()
 
 app.register_blueprint(pageBp)
 app.register_blueprint(aurBp)
@@ -28,4 +34,6 @@ if __name__ == "__main__":
         min_size=(900, 600),
     )
     #app.run(debug=True)
+
+
     webview.start(debug=True)

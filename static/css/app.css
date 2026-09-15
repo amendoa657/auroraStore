@@ -54,11 +54,18 @@ mark { background: var(--corFundoDestaqueSuave); color: var(--corDestaque); bord
 .marca {
   display: flex; align-items: center; gap: 10px;
   font-weight: 600; font-size: 13.5px; color: inherit; flex: none;
+  position: relative;
 }
 .marca:hover { color: inherit; }
 .marca-glifo {
   width: 15px; height: 15px; border-radius: 4px; background: var(--corDestaque);
   transition: transform .28s cubic-bezier(.2, .8, .3, 1), border-radius .28s;
+}
+.letraLogo {
+  position: absolute;
+  left: 4%;
+  top: 4%;
+  color: var(--corFundoJanela);
 }
 .marca:hover .marca-glifo { transform: rotate(45deg) scale(1.08); border-radius: 6px; }
 .meta-cabecalho { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

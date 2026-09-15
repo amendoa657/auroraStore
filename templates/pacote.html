@@ -137,21 +137,21 @@
       </section>
     {% endif %}
 
-    {% if pkgBuild %}
+    {% if pacote.pkgBuild %}
       <div class="separador" style="margin: 0"></div>
       <section>
         <div class="rotulo-painel">
           <span>PKGBUILD</span>
           <button class="vinculo-painel" data-abrir="pkgbuild">abrir</button>
         </div>
-        <pre class="pkgbuild" style="margin: 9px 0 0">{{ pkgBuild.split("\n")[:5] | join("\n") }}
+        <pre class="pkgbuild" style="margin: 9px 0 0">{{ pacote.pkgBuild.split("\n")[:5] | join("\n") }}
 …</pre>
       </section>
     {% endif %}
 
   </aside>
 
-  {% if pkgBuild %}
+  {% if pacote.pkgBuild %}
     <dialog class="dialogo" id="pkgbuild">
       <header class="dialogo-cabecalho">
         <h2>PKGBUILD</h2>
@@ -159,7 +159,7 @@
         <button class="btn btn-icone btn-fechar" data-fechar aria-label="Fechar">✕</button>
       </header>
       <div class="dialogo-corpo">
-        <pre class="pkgbuild pkgbuild-cheio">{{ pkgBuild }}</pre>
+        <pre class="pkgbuild pkgbuild-cheio">{{ pacote.pkgBuild }}</pre>
       </div>
       <footer class="dialogo-rodape">
         <button class="btn btn-primario" data-fechar>Fechar</button>

@@ -1,9 +1,6 @@
-from flask import Blueprint, request, render_template
-from services.init.paru import criarConfigParu
+from flask import Blueprint, request, redirect
 
-from utils.fontes import fontes
-
-import os, re, subprocess
+import system.downloadQueue as q
 
 systemBp = Blueprint("systemBp", __name__)
 
@@ -11,20 +8,13 @@ systemBp = Blueprint("systemBp", __name__)
 def instalarAur():
     pacote = request.form.get("pacote", "")
 
-    config_paru = criarConfigParu()
-    ambiente = os.environ.copy()
-    ambiente["PARU_CONF"] = str(config_paru)
+    q.statusDownloads[pacote] = {
+        "Name": pacote,
+        "situacao": "aguardando",
+        "progresso": 0,
+        "passo": "Na fila de espera...",
+    }
 
-    resultado = subprocess.run(
-        ["paru", "-S", "--needed", "--noconfirm", pacote],
-        env=ambiente,
-    )
+    q.filaDeDownloads.put(pacote)
 
-    if resultado.returncode == 0:
-        return render_template(
-            "descobrir.html",
-            contagens=None,
-            fontes=fontes
-        )
-
-    return f"Não foi possível instalar {pacote}.", 500
+    return redirect("/fila")
