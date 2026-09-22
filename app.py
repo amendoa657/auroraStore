@@ -36,4 +36,4 @@ if __name__ == "__main__":
     #app.run(debug=True)
 
 
-    webview.start(debug=True)
+    webview.start(debug=False)

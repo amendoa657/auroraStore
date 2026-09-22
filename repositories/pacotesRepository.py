@@ -1,4 +1,5 @@
 import requests
+from models.pacote import Pacote
 
 
 def buscarPacotes(termo, modo):
@@ -9,6 +10,20 @@ def buscarPacotes(termo, modo):
 
     dados = resposta.json()
     resultados = dados["results"]
+    pacotes = []
+
+    for resultado in resultados:
+        pacote = Pacote(resultado["Name"], resultado["NumVotes"], resultado["Description"], resultado["Popularity"], resultado["URL"], resultado["Version"], resultado["Maintainer"], None, None, None)
+        print(pacote)
+        pacotes.append(pacote)
+
+    pacotes.sort(
+        key=lambda pacote: (
+            pacote.nome.casefold() != termo.casefold(),
+            not pacote.nome.casefold().startswith(termo.casefold()),
+            pacote.nome.casefold(),
+        )
+    )
 
     resultados.sort(
         key=lambda pacote: (

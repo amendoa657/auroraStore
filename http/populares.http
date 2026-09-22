@@ -6,3 +6,7 @@ Accept: application/json
 ### Firefox
 GET https://archlinux.org/packages/extra/x86_64/firefox/json
 Accept: application/json
+
+###teste
+GET https://aur.archlinux.org/rpc/v5/info/nvim-lazy
+Accept: application/json
