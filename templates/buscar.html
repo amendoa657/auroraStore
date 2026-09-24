@@ -95,9 +95,9 @@
             {% for pacote in resultados %}
                 {# Lê os dois formatos: Name/Description/Version da AUR ou
            name/desc/version do pyalpm. #}
-                {% set nome = pacote.Name or pacote.name %}
-                {% set descricao = pacote.Description or pacote.desc %}
-                {% set versao = pacote.Version or pacote.version %}
+                {% set nome = pacote.Name or pacote.nome %}
+                {% set descricao = pacote.Description or pacote.descricao %}
+                {% set versao = pacote.Version or pacote.versao %}
 
                 <div class="linha-pacote">
                     <a class="nome-pacote" href="/buscar/{{ nome }}?q={{ termo | urlencode }}&modo={{ modo }}&pagina=buscar">

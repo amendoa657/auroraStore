@@ -1,7 +1,6 @@
 from flask import render_template, request, Blueprint, current_app
 from config.fontes import fontes
 
-from repositories.pacotesRepository import buscarPacote
 from config.busca import busca
 
 from services.pacotesService import buscarPacotes

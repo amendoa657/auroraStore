@@ -20,11 +20,11 @@
 {% from "_macros.html" import botao, selo, icone %}
 
 {% set pagina = "pacote" %}
-{% block titulo %}{{ pacote.Name}} — Pacotes{% endblock %}
+{% block titulo %}{{ pacote.nome}} — Pacotes{% endblock %}
 
 {% block cabecalho %}
   <a class="btn btn-voltar" href="/buscar">← Voltar</a>
-  <span class="meta meta-cabecalho">{{ pacote.fonte }} / {{ pacote.Name }}</span>
+  <span class="meta meta-cabecalho">{{ pacote.repositorio }} / {{ pacote.nome }}</span>
 {% endblock %}
 
 {# Esta tela ocupa a largura toda: sem barra lateral e sem rodapé. #}
@@ -41,12 +41,12 @@
       {{ icone(pacote, "icone-78") }}
       <div class="detalhe-identidade">
         <div class="linha-titulo">
-          <h1>{{ pacote.Name }}</h1>
+          <h1>{{ pacote.nome }}</h1>
           {{ selo(pacote) }}
         </div>
         <div class="subtitulo">
-          {{ pacote.Name }} {{ pacote.Version }}
-          {% if pacote.Maintainer %}· mantido por {{ pacote.Maintainer }}{% endif %}
+          {{ pacote.nome }} {{ pacote.versao }}
+          {% if pacote.criadores %}· mantido por {{ pacote.criadores }}{% endif %}
         </div>
       </div>
       <div class="acoes-detalhe">
@@ -54,14 +54,14 @@
       </div>
     </div>
 
-    {% if pacote.fonte == "aur" %}
+    {% if pacote.repositorio == "aur" %}
       <section class="aviso">
         <div class="aviso-icone" aria-hidden="true">!</div>
         <div>
           <h3>Pacote da AUR — enviado por usuários</h3>
           <p>Não é revisado pelos mantenedores do Arch. O PKGBUILD roda na sua máquina
              durante a compilação. Revise o script antes de continuar.</p>
-          {% if pacote.pkgbuild %}
+          {% if pacote.pkgBuild %}
             <div class="acoes">
               <button class="btn btn-destrutivo" data-abrir="pkgbuild">Ver PKGBUILD</button>
             </div>
@@ -81,10 +81,10 @@
       </div>
     {% endif %}
 
-    {% if pacote.Description %}
+    {% if pacote.descricao %}
       <section class="bloco">
         <h2>Sobre</h2>
-        <p>{{ pacote.Description }}</p>
+        <p>{{ pacote.descricao }}</p>
       </section>
     {% endif %}
 
@@ -103,20 +103,20 @@
     <section>
       <div class="rotulo-painel">DETALHES</div>
       <div class="lista-dados" style="margin-top: 11px">
-        {% if pacote.NumVotes is not none %}
-          <div><span class="chave">Votos AUR</span><span class="valor">{{ pacote.NumVotes }}</span></div>
+        {% if pacote.numeroVotos is not none %}
+          <div><span class="chave">Votos AUR</span><span class="valor">{{ pacote.numeroVotos }}</span></div>
         {% endif %}
         {% if pacote.Popularity %}
-          <div><span class="chave">Popularidade</span><span class="valor">{{ pacote.Popularity }}</span></div>
+          <div><span class="chave">Popularidade</span><span class="valor">{{ pacote.popularidade }}</span></div>
         {% endif %}
         {% if pacote.atualizado %}
           <div><span class="chave">Atualizado</span><span class="valor">{{ pacote.atualizado }}</span></div>
         {% endif %}
-        {% if pacote.License %}
-          <div><span class="chave">Licença</span><span class="valor">{{ pacote.License }}</span></div>
+        {% if pacote.licensas %}
+          <div><span class="chave">Licença</span><span class="valor">{{ pacote.licensas }}</span></div>
         {% endif %}
-        {% if pacote.URL %}
-          <div><span class="chave">Download</span><span class="valor">{{ pacote.URL }}</span></div>
+        {% if pacote.url %}
+          <div><span class="chave">Download</span><span class="valor">{{ pacote.url }}</span></div>
         {% endif %}
         {% if pacote.tamanho %}
           <div><span class="chave">Instalado</span><span class="valor">{{ pacote.tamanho }}</span></div>
@@ -124,13 +124,13 @@
       </div>
     </section>
 
-    {% if pacote.Depends %}
+    {% if pacote.dependencias %}
       <div class="separador" style="margin: 0"></div>
       <section>
-        <div class="rotulo-painel">DEPENDÊNCIAS · {{ pacote.Depends | length }}</div>
+        <div class="rotulo-painel">DEPENDÊNCIAS · {{ pacote.dependencias| length }}</div>
         <div class="nuvem-deps" style="margin-top: 9px">
           {#  Aceita tanto uma lista de nomes quanto de dicts com "instalada". #}
-          {% for dep in pacote.Depends %}
+          {% for dep in pacote.dependencias %}
               <a class="dep" href="/buscar/{{ dep }}">{{ dep }}</a>
           {% endfor %}
         </div>

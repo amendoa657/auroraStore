@@ -1,35 +1,61 @@
 import subprocess
+from models.pacote import Pacote
+import requests
 
 import repositories.pacotesRepository as r
 
 destaque = "nvim-lazy"
 
 
-def buscarPacotes(termo, modo):
-    global pesquisa
+def buscarPkgBuild(pacote):
+    resposta = requests.get(
+        "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=" + pacote,
+        timeout=10,
+        )
 
+    return resposta.content.decode("utf-8")
+
+
+def buscarPacotes(termo, modo):
     if not termo:
         return None
 
-    resultados=r.buscarPacotes(termo, modo)
+    resposta = requests.get(
+        "https://aur.archlinux.org/rpc/v5/search/" + termo,
+        timeout=10,
+        ).json()
 
-    #for pacote in pacotes:
-    #    pacote["instalado"] = pacote["Name"] in instalados
+    resultados = resposta["results"]
+    pacotes = []
 
-    return resultados
+    for resultado in resultados:
+        pacote = Pacote(resultado, "aur")
+        print(pacote.nome)
+        pacotes.append(pacote)
+
+    pacotes.sort(
+        key=lambda pacote: (
+            pacote.nome.casefold() != termo.casefold(),
+            not pacote.nome.casefold().startswith(termo.casefold()),
+            pacote.nome.casefold(),
+        )
+    )
+    return pacotes
 
 def buscarPacote(pacote):
-    pkgBuild = r.buscarPkgBuild(pacote)
-    pacote = r.buscarPacote(pacote)
+    resposta = requests.get(
+        "https://aur.archlinux.org/rpc/v5/info/" + pacote,
+        timeout=10,
+    )
 
-    pacote["fonte"] = "aur"
-    pacote["pkgBuild"] = pkgBuild
+    dados = resposta.json()
+    resultado = dados["results"]
 
-
-    #for pacote in pacotes:
-    #    pacote["instalado"] = pacote["Name"] in instalados
+    if resultado:
+        pacote = Pacote(resultado[0], "aur", pkgBuild=buscarPkgBuild(pacote))
 
     return pacote
+
 
 
 def contarLinhas(comando):
@@ -53,10 +79,31 @@ def buscarPacotesInstalados():
 
 
 def buscarDestaques():
-    return r.buscarPacote(destaque)
+    return buscarPacote(destaque)
 
 def buscarPopulares():
-    return r.buscarPopulares(7)
+    #https://aur.archlinux.org/packages-meta-v1.json.gz fazer sistema de sqlite topzera raiz
+    resposta = requests.get(
+        "https://aur.archlinux.org/rpc/v5/search?arg=firefox&type=search",
+        timeout=10,
+    )
+
+    resposta.raise_for_status()
+
+    dados = resposta.json()
+
+    populares = []
+    for pacote in dados.get("results", []):
+        populares.append(Pacote(pacote, "aur"))
+
+    populares.sort(
+        key=lambda pacote: pacote.popularidade,
+        reverse=True
+    )
+
+    return populares[:7]
+
+
 
 
 #instalados=buscarPacotesInstalados()

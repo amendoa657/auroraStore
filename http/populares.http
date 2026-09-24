@@ -10,3 +10,8 @@ Accept: application/json
 ###teste
 GET https://aur.archlinux.org/rpc/v5/info/nvim-lazy
 Accept: application/json
+
+
+###buscar pacman
+GET https://archlinux.org/packages/search/json/?q=firefox
+Accept: application/json

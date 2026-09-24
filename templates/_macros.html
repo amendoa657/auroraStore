@@ -21,10 +21,10 @@
 
 {# Etiqueta da fonte: a AUR ganha a cor de alerta, o resto a cor calma. #}
 {% macro selo(pacote) %}
-  {% if pacote.fonte == "aur" %}
+  {% if pacote.repositorio == "aur" %}
     <span class="selo selo-aur">AUR</span>
-  {% elif pacote.fonte %}
-    <span class="selo selo-oficial">{{ pacote.fonte }}</span>
+  {% elif pacote.repositorio %}
+    <span class="selo selo-oficial">{{ pacote.repositorio }}</span>
   {% endif %}
 {% endmacro %}
 
@@ -33,7 +33,7 @@
    Troque por <img src="..."> quando tiver ícones de verdade. #}
 {% macro icone(pacote, tamanho="icone-42") %}
   <div class="icone-app {{ tamanho }}" aria-hidden="true">
-    {{ (pacote.titulo or pacote.Name)[0] | upper }}
+    {{ (pacote.titulo or pacote.nome)[0] | upper }}
   </div>
 {% endmacro %}
 
@@ -64,8 +64,8 @@
 
   {% elif pacote.instalado %}
     <form class="form-acao" method="post" action="/remover">
-      <input type="hidden" name="pacote" value="{{ pacote.Name }}">
-      <button class="btn btn-sucesso btn-instalado{{ tamanho }}" title="Remover {{ pacote.Name }}">
+      <input type="hidden" name="pacote" value="{{ pacote.nome }}">
+      <button class="btn btn-sucesso btn-instalado{{ tamanho }}" title="Remover {{ pacote.nome }}">
         <span class="rotulo-padrao">Instalado</span>
         <span class="rotulo-hover">Remover</span>
       </button>
@@ -73,7 +73,7 @@
 
   {% else %}
     <form class="form-acao" method="post" action="/aur/instalar">
-      <input type="hidden" name="pacote" value="{{ pacote.Name }}">
+      <input type="hidden" name="pacote" value="{{ pacote.nome }}">
       <button class="btn{{ " btn-primario" if primario else "" }}{{ tamanho }}">Instalar</button>
     </form>
   {% endif %}
@@ -86,11 +86,11 @@
     <a class="cartao-topo" href="/pacote/{{ pacote.nome }}">
       {{ icone(pacote) }}
       <div class="cartao-identidade">
-        <h3>{{ pacote.titulo or pacote.Name }}</h3>
-        <div class="versao">{{ pacote.Version }}</div>
+        <h3>{{ pacote.titulo or pacote.nome }}</h3>
+        <div class="versao">{{ pacote.versao }}</div>
       </div>
     </a>
-    <p class="resumo">{{ pacote.Description }}</p>
+    <p class="resumo">{{ pacote.descricao }}</p>
     <div class="cartao-rodape">
       {{ selo(pacote) }}
       {{ botao(pacote) }}
@@ -102,11 +102,11 @@
 {# Linha para as listas de Buscar e Instalados. #}
 {% macro linha(pacote, mostrar_popularidade=true) %}
   <div class="linha-pacote">
-    <a class="nome-pacote" href="/pacote/{{ pacote.Name }}">
-      <strong>{{ pacote.Name }}</strong>
-      <span>{{ pacote.Description }}</span>
+    <a class="nome-pacote" href="/pacote/{{ pacote.nome }}">
+      <strong>{{ pacote.nome }}</strong>
+      <span>{{ pacote.descricao }}</span>
     </a>
-    <div class="col-versao">{{ pacote.Version }}</div>
+    <div class="col-versao">{{ pacote.versao }}</div>
     <div class="col-fonte">{{ selo(pacote) }}</div>
     {% if mostrar_popularidade %}
       <div class="col-pop">
