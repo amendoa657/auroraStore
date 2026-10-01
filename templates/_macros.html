@@ -83,7 +83,7 @@
 {# Cartão para as grades de Descobrir. #}
 {% macro cartao(pacote) %}
   <article class="cartao cartao-app">
-    <a class="cartao-topo" href="/pacote/{{ pacote.nome }}">
+    <a class="cartao-topo" href="/buscar/{{ pacote.nome }}">
       {{ icone(pacote) }}
       <div class="cartao-identidade">
         <h3>{{ pacote.titulo or pacote.nome }}</h3>
@@ -102,7 +102,7 @@
 {# Linha para as listas de Buscar e Instalados. #}
 {% macro linha(pacote, mostrar_popularidade=true) %}
   <div class="linha-pacote">
-    <a class="nome-pacote" href="/pacote/{{ pacote.nome }}">
+    <a class="nome-pacote" href="/buscar/{{ pacote.nome }}">
       <strong>{{ pacote.nome }}</strong>
       <span>{{ pacote.descricao }}</span>
     </a>

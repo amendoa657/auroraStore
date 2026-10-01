@@ -7,6 +7,8 @@ from controllers.systemController import systemBp
 from controllers.pacmanController import pacmanBp
 
 from config.paru import criarConfigParu
+from config.reloadDatabase import reloadDatabase
+
 from system.downloadQueue import trabalhador
 from system.downloadQueue import filaDeDownloads
 
@@ -25,6 +27,7 @@ app.register_blueprint(pacmanBp)
 
 if __name__ == "__main__":
     config_paru = criarConfigParu()
+    reloadDatabase()
 
     window = webview.create_window(
         "Aurora Store",
