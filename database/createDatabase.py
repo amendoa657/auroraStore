@@ -7,8 +7,10 @@ import gzip, json
 raiz = Path(__file__).resolve().parent.parent
 arquivoJson = raiz / "database" / "packages-meta-v1.json.gz"
 def createDatabase():
+    cursor.execute("drop table if exists pacotes;")
+
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS packages (
+    CREATE TABLE IF NOT EXISTS pacotes (
         nome TEXT PRIMARY KEY,
         repositorio TEXT,
         numeroVotos INTEGER,
@@ -29,7 +31,7 @@ def createDatabase():
 
     for pacote in dados:
         cursor.execute("""
-            INSERT OR REPLACE INTO packages (
+            INSERT OR REPLACE INTO pacotes (
                 nome,
                 repositorio,
                 numeroVotos,

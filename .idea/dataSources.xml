@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="archPkg" uuid="74636782-4b53-452b-87e2-b1d2e9dbb874">
+    <data-source source="LOCAL" name="pacotesArch" uuid="adf6c406-aafe-49dd-b1c9-aeb01b4e1c41">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:H:\Python\auroraStore\archPkg.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:H:\Python\auroraStore\pacotesArch.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.51.1/org/xerial/sqlite-jdbc/3.51.1.0/sqlite-jdbc-3.51.1.0.jar</url>
+        </library>
+      </libraries>
     </data-source>
   </component>
 </project>

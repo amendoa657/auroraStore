@@ -1,6 +1,7 @@
 import subprocess
-from models.pacote import Pacote
+from models.pacoteAntigo import Pacote
 import requests
+import time
 
 import repositories.pacotesRepository as r
 
@@ -17,6 +18,23 @@ def buscarPkgBuild(pacote):
 
 
 def buscarPacotes(termo, modo):
+    inicio = time.perf_counter()
+
+    if not termo:
+        return None
+
+    pacotes = r.buscarPacotes(termo)
+
+    fim = time.perf_counter()
+
+    tempo_ms = (fim - inicio) * 1000
+
+    print(f"Pesquisa demorou {tempo_ms:.2f} ms")
+    return pacotes
+
+def buscarPacotesAntigo(termo, modo):
+    inicio = time.perf_counter()
+
     if not termo:
         return None
 
@@ -30,7 +48,7 @@ def buscarPacotes(termo, modo):
 
     for resultado in resultados:
         pacote = Pacote(resultado, "aur")
-        print(pacote.nome)
+        #print(pacote.nome)
         pacotes.append(pacote)
 
     pacotes.sort(
@@ -40,6 +58,12 @@ def buscarPacotes(termo, modo):
             pacote.nome.casefold(),
         )
     )
+    fim = time.perf_counter()
+
+    tempo_ms = (fim - inicio) * 1000
+
+    print(f"Pesquisa demorou {tempo_ms:.2f} ms")
+
     return pacotes
 
 def buscarPacote(pacote):

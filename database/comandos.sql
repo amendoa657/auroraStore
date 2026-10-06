@@ -1,0 +1,55 @@
+SELECT *
+FROM pacotes
+WHERE
+    nome LIKE '%firefox%'
+    OR descricao LIKE '%firefox%'
+ORDER BY
+    CASE
+        WHEN nome = 'firefox' THEN 1
+        WHEN nome LIKE 'firefox%' THEN 2
+        WHEN nome LIKE '%firefox%' THEN 3
+        WHEN descricao LIKE '%firefox%' THEN 4
+        ELSE 5
+    END,
+    popularidade DESC
+limit 300;
+
+
+SELECT COUNT(*) FROM pacotes;
+
+CREATE VIRTUAL TABLE pacotes_fts USING fts5(
+    nome,
+    descricao,
+    content='pacotes',
+    content_rowid='rowid'
+);
+
+
+drop table pacotes_fts;
+
+INSERT INTO pacotes_fts(pacotes_fts)
+VALUES('rebuild');
+
+INSERT INTO pacotes_fts (nome, descricao)
+SELECT nome, descricao
+FROM pacotes;
+
+
+SELECT *
+FROM pacotes_fts
+WHERE pacotes_fts MATCH 'firefox';
+
+        SELECT p.*
+        FROM pacotes_fts
+        JOIN pacotes AS p
+            ON p.rowid = pacotes_fts.rowid
+        WHERE pacotes_fts MATCH 'firefox'
+        ORDER BY
+            CASE
+                WHEN p.nome = 'firefox' THEN 1
+                WHEN p.nome LIKE 'firefox%' THEN 2
+                WHEN p.descricao LIKE '%firefox%' THEN 3
+                ELSE 4
+            END,
+            p.popularidade DESC
+

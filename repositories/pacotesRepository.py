@@ -1,6 +1,51 @@
 import requests
+from database.connect import getConnection
+from models.pacote import Pacote
+import time
 
+def buscarPacotes(termo):
+    inicio = time.perf_counter()
 
+    con = getConnection()
+    cursor = con.cursor()
+    t1 = time.perf_counter()
+
+    cursor.execute('''
+        SELECT *
+        FROM pacotes
+        WHERE
+            nome LIKE ?
+            OR descricao LIKE ?
+        ORDER BY
+            CASE
+                WHEN nome = ? THEN 1
+                WHEN nome LIKE ? THEN 2
+                WHEN descricao LIKE ? THEN 3
+                ELSE 4
+            END,
+            popularidade DESC;
+    ''', (
+        f'%{termo}%',
+        f'%{termo}%',
+        termo,
+        f'%{termo}%',
+        f'%{termo}%'
+    ))
+    t2 = time.perf_counter()
+    colunas = cursor.fetchall()
+    t3 = time.perf_counter()
+
+    pacotes = [Pacote.fromColuna(coluna) for coluna in colunas]
+    t4 = time.perf_counter()
+
+    print(f"conexão: {(t1-inicio)*1000:.2f} ms")
+    print(f"execute: {(t2-t1)*1000:.2f} ms")
+    print(f"fetchall: {(t3-t2)*1000:.2f} ms")
+    print(f"models: {(t4-t3)*1000:.2f} ms")
+    print(f"TOTAL: {(t4-inicio)*1000:.2f} ms")
+
+    con.close()
+    return pacotes
 
 def buscarPopulares(limite):
     resposta = requests.get(
