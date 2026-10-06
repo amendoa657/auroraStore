@@ -1,10 +1,10 @@
-# 📦 Paru GUI
+# Paru GUI
 
 Uma interface gráfica nativa, leve e responsiva para o **paru** (AUR Helper do Arch Linux), desenvolvida com **Flask**, **pywebview** e suporte nativo a privilégios via **Polkit**.
 
 ---
 
-## 🎥 Demonstração
+## Demonstração
 
 <video src="assetsReadme/showcase.mp4" controls width="100%"></video>
 
@@ -12,7 +12,7 @@ Uma interface gráfica nativa, leve e responsiva para o **paru** (AUR Helper do 
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 * **Busca Inteligente:** Pesquisa rápida de pacotes no repositório oficial e no AUR, mantendo o histórico de busca ativo na sessão.
 * **Terminal em Tempo Real:** Acompanhamento assíncrono da compilação e download dos pacotes com atualização contínua de status.
@@ -21,7 +21,7 @@ Uma interface gráfica nativa, leve e responsiva para o **paru** (AUR Helper do 
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 | Camada | Tecnologia |
 | :--- | :--- |
@@ -32,7 +32,7 @@ Uma interface gráfica nativa, leve e responsiva para o **paru** (AUR Helper do 
 
 ---
 
-## 📌 Pré-requisitos
+## Pré-requisitos
 
 Para garantir que a compilação dos pacotes do AUR ocorra sem erros, certifique-se de ter o grupo `base-devel` e as dependências básicas instaladas:
 
