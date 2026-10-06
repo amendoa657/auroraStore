@@ -54,6 +54,24 @@ def createDatabase():
             )
         )
 
+    cursor.execute('''
+        drop table if exists pacotes_fts;
+    ''')
+
+    cursor.execute('''
+        CREATE VIRTUAL TABLE pacotes_fts USING fts5(
+            nome,
+            descricao,
+            content='pacotes',
+            content_rowid='rowid'
+        );
+    ''')
+
+    cursor.execute('''
+        INSERT INTO pacotes_fts(pacotes_fts)
+        VALUES('rebuild');
+    ''')
+
 
     con.commit()
     con.close()

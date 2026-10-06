@@ -25,7 +25,7 @@ CREATE VIRTUAL TABLE pacotes_fts USING fts5(
 );
 
 
-drop table pacotes_fts;
+drop table if exists pacotes_fts;
 
 INSERT INTO pacotes_fts(pacotes_fts)
 VALUES('rebuild');

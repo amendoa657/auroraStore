@@ -11,25 +11,24 @@ def buscarPacotes(termo):
     t1 = time.perf_counter()
 
     cursor.execute('''
-        SELECT *
-        FROM pacotes
-        WHERE
-            nome LIKE ?
-            OR descricao LIKE ?
+        SELECT p.*
+        FROM pacotes_fts
+        JOIN pacotes AS p
+            ON p.rowid = pacotes_fts.rowid
+        WHERE pacotes_fts MATCH ?
         ORDER BY
             CASE
-                WHEN nome = ? THEN 1
-                WHEN nome LIKE ? THEN 2
-                WHEN descricao LIKE ? THEN 3
+                WHEN p.nome = ? THEN 1
+                WHEN p.nome LIKE ? THEN 2
+                WHEN p.descricao LIKE ? THEN 3
                 ELSE 4
             END,
-            popularidade DESC;
+            p.popularidade DESC
     ''', (
-        f'%{termo}%',
-        f'%{termo}%',
         termo,
+        termo,
+        f'{termo}%',
         f'%{termo}%',
-        f'%{termo}%'
     ))
     t2 = time.perf_counter()
     colunas = cursor.fetchall()
