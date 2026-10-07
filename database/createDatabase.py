@@ -1,8 +1,8 @@
-from database.connect import cursor
-from database.connect import con
-
+import gzip
+import json
 from pathlib import Path
-import gzip, json
+
+from database.connect import con, cursor
 
 raiz = Path(__file__).resolve().parent.parent
 arquivoJson = raiz / "database" / "packages-meta-v1.json.gz"
@@ -22,7 +22,8 @@ def createDatabase():
         tamanho TEXT,
         licensas TEXT,
         dependencias TEXT,
-        pkgBuild TEXT
+        pkgBuild TEXT,
+        instalado BOOLEAN default false
     )
     """)
 

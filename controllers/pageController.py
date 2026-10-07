@@ -1,10 +1,9 @@
-from flask import render_template, Blueprint
-
-from config.fontes import fontes
-from config.tema import getTema
+from flask import Blueprint, render_template
 
 import services.pacotesService as s
 import system.downloadQueue as q
+from config.fontes import fontes
+from config.tema import getTema
 
 pageBp = Blueprint("pageBp", __name__)
 @pageBp.get("/")
@@ -14,6 +13,7 @@ def home():
         contagens=None,
         fontes=fontes,
         populares=s.buscarPopulares(),
+        votados=s.buscarVotados(),
         destaque=s.buscarDestaques()
     )
 

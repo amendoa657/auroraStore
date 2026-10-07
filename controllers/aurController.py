@@ -1,10 +1,8 @@
-from flask import render_template, request, Blueprint, current_app
-from config.fontes import fontes
+from flask import Blueprint, current_app, render_template, request
 
 from config.busca import busca
-
-from services.pacotesService import buscarPacotes
-from services.pacotesService import buscarPacote
+from config.fontes import fontes
+from services.pacotesService import buscarPacote, buscarPacotes
 
 aurBp = Blueprint("aurBp", __name__)
 

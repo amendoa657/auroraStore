@@ -1,14 +1,14 @@
-import requests
-from database.connect import getConnection
-from models.pacote import Pacote
 import time
 
-def buscarPacotes(termo):
-    inicio = time.perf_counter()
+import requests
 
+from database.connect import getConnection
+from models.pacote import Pacote
+
+
+def buscarPacotes(termo):
     con = getConnection()
     cursor = con.cursor()
-    t1 = time.perf_counter()
 
     cursor.execute('''
         SELECT p.*
@@ -30,23 +30,72 @@ def buscarPacotes(termo):
         f'{termo}%',
         f'%{termo}%',
     ))
-    t2 = time.perf_counter()
-    colunas = cursor.fetchall()
-    t3 = time.perf_counter()
 
-    pacotes = [Pacote.fromColuna(coluna) for coluna in colunas]
-    t4 = time.perf_counter()
-
-    print(f"conexão: {(t1-inicio)*1000:.2f} ms")
-    print(f"execute: {(t2-t1)*1000:.2f} ms")
-    print(f"fetchall: {(t3-t2)*1000:.2f} ms")
-    print(f"models: {(t4-t3)*1000:.2f} ms")
-    print(f"TOTAL: {(t4-inicio)*1000:.2f} ms")
+    pacotes = [Pacote.fromColuna(coluna) for coluna in cursor.fetchall()]
 
     con.close()
     return pacotes
 
+
+def buscarPacote(nome):
+    con = getConnection()
+    cursor = con.cursor()
+
+    cursor.execute('''
+        SELECT p.*
+        FROM pacotes AS p
+        WHERE p.nome = ?
+        LIMIT 1;
+    ''', ('nvim-lazy',))
+
+    pacote = Pacote.fromColuna(cursor.fetchall()[0])
+
+    return pacote
+
+
+
 def buscarPopulares(limite):
+    con = getConnection()
+    cursor = con.cursor()
+
+    cursor.execute('''
+        SELECT p.*
+        FROM pacotes_fts
+        JOIN pacotes AS p
+            ON p.rowid = pacotes_fts.rowid
+        ORDER BY
+            p.popularidade DESC
+        limit ?;
+    ''',(limite,))
+
+    pacotes = [Pacote.fromColuna(coluna) for coluna in cursor.fetchall()]
+    
+    con.close()
+    return pacotes
+
+def buscarVotados(limite):
+    con = getConnection()
+    cursor = con.cursor()
+
+    cursor.execute('''
+        SELECT p.*
+        FROM pacotes_fts
+        JOIN pacotes AS p
+            ON p.rowid = pacotes_fts.rowid
+        ORDER BY
+            p.numeroVotos DESC
+        limit ?;
+    ''',(limite,))
+
+    pacotes = [Pacote.fromColuna(coluna) for coluna in cursor.fetchall()]
+    
+    con.close()
+    return pacotes
+
+
+
+
+def buscarPopularesAntigo(limite):
     resposta = requests.get(
         "https://aur.archlinux.org/rpc/v5/search?arg=firefox&type=search",
         timeout=10,
@@ -64,4 +113,5 @@ def buscarPopulares(limite):
     )
 
     return populares[:limite]
+
 

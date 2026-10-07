@@ -1,7 +1,8 @@
-from flask import Blueprint, request, render_template
+import re
+import subprocess
 
-import re, subprocess
 import requests
+from flask import Blueprint, render_template, request
 
 pacmanBp = Blueprint("pacmanBp", __name__)
 

@@ -1,16 +1,13 @@
-from flask import Flask
 import webview
-
-from controllers.pageController import pageBp
-from controllers.aurController import aurBp
-from controllers.systemController import systemBp
-from controllers.pacmanController import pacmanBp
+from flask import Flask
 
 from config.paru import criarConfigParu
 from config.reloadDatabase import reloadDatabase
-
-from system.downloadQueue import trabalhador
-from system.downloadQueue import filaDeDownloads
+from controllers.aurController import aurBp
+from controllers.pacmanController import pacmanBp
+from controllers.pageController import pageBp
+from controllers.systemController import systemBp
+from system.downloadQueue import filaDeDownloads, trabalhador
 
 app = Flask(__name__)
 app.secret_key = "chave-secreta-paru-gui"
@@ -36,7 +33,7 @@ if __name__ == "__main__":
         height=800,
         min_size=(900, 600),
     )
-    app.run(debug=True)
+    #app.run(debug=True)
 
 
-    #webview.start(debug=False)
+    webview.start(debug=False)

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, redirect
+from flask import Blueprint, redirect, request
 
 import system.downloadQueue as q
 
@@ -9,7 +9,7 @@ def instalarAur():
     pacote = request.form.get("pacote", "")
 
     q.statusDownloads[pacote] = {
-        "Name": pacote,
+        "nome": pacote,
         "situacao": "aguardando",
         "progresso": 0,
         "passo": "Na fila de espera...",

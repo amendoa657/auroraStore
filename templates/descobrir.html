@@ -66,6 +66,21 @@
     </div>
   </section>
 
+  <section class="secao">
+    <div class="titulo-secao">
+      <h2>Os mais votados</h2>
+      <a href="/buscar">Ver tudo</a>
+    </div>
+
+    <div class="grade-cartoes">
+      {% for pacote in votados %}
+        {{ cartao(pacote) }}
+      {% else %}
+        {{ vazio("Nada para mostrar ainda", "Nenhum pacote chegou do servidor.") }}
+      {% endfor %}
+    </div>
+  </section>
+
   {% if categorias %}
     <section class="secao">
       <div class="titulo-secao"><h2>Categorias</h2></div>

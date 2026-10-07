@@ -1,9 +1,10 @@
 import subprocess
-from models.pacoteAntigo import Pacote
-import requests
 import time
 
+import requests
+
 import repositories.pacotesRepository as r
+from models.pacoteAntigo import Pacote
 
 destaque = "nvim-lazy"
 
@@ -103,29 +104,14 @@ def buscarPacotesInstalados():
 
 
 def buscarDestaques():
-    return buscarPacote(destaque)
+    return r.buscarPacote(destaque)
 
 def buscarPopulares():
-    #https://aur.archlinux.org/packages-meta-v1.json.gz fazer sistema de sqlite topzera raiz
-    resposta = requests.get(
-        "https://aur.archlinux.org/rpc/v5/search?arg=firefox&type=search",
-        timeout=10,
-    )
+    return r.buscarPopulares(7)
 
-    resposta.raise_for_status()
-
-    dados = resposta.json()
-
-    populares = []
-    for pacote in dados.get("results", []):
-        populares.append(Pacote(pacote, "aur"))
-
-    populares.sort(
-        key=lambda pacote: pacote.popularidade,
-        reverse=True
-    )
-
-    return populares[:7]
+def buscarVotados():
+    return r.buscarVotados(7)
+    
 
 
 

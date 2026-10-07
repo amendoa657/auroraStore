@@ -53,8 +53,8 @@
             {{ icone(item, "icone-38") }}
           {% endif %}
 
-          <a class="info" href="/buscar/{{ item.Name }}">
-            <strong>{{ item.Name }}</strong>
+          <a class="info" href="/buscar/{{ item.nome }}">
+            <strong>{{ item.nome }}</strong>
             {% if item.situacao == "instalando" %}
               <span class="ativo">{{ item.passo or "instalando" }}</span>
             {% elif item.situacao == "concluido" %}

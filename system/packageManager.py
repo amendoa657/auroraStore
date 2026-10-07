@@ -1,6 +1,9 @@
+import os
+import stat
+import subprocess
+
 from config.paru import criarConfigParu
 
-import os, subprocess, stat
 
 def instalarPacoteParu(pacote):
     #config_paru = criarConfigParu()
