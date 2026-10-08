@@ -4,13 +4,13 @@ from database.connect import getConnection
 
 from config.downloadFromMirrors import downloadAur
 from config.downloadFromMirrors import downloadCore
+from config.downloadFromMirrors import downloadExtra
 
 con = getConnection()
 cursor = con.cursor()
 
 raiz = Path(__file__).resolve().parent.parent
-arquivoJson = raiz / "database" / "packages-meta-v1.json.gz"
-
+#TIRAR O IGNORE PARA A VERSAO ATUALIZAR!!!!!!!!!!!!!
 def insertPacotesAur():
     dados = downloadAur()
 
@@ -26,7 +26,8 @@ def insertPacotesAur():
                 versao,
                 criadores
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(nome) DO UPDATE SET
+                versao = excluded.versao
             ''', (
                 pacote.get("Name"),
                 "aur",
@@ -45,15 +46,55 @@ def insertPacotesAur():
                     ''')
 
     con.commit()
-
+#TIRAR O IGNORE PARA A VERSAO ATUALIZAR!!!!!!!!!!!!!
 def insertPacotesExtra():
-    pass
+    dados = downloadExtra()
+    # print(dados)
+
+    for pacote in dados:
+
+        cursor.execute('''
+                INSERT INTO pacotes (
+                    nome,
+                    repositorio,
+                    descricao,
+                    tamanho,
+                    licensas,
+                    url,
+                    versao,
+                    criadores
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(nome) DO UPDATE SET
+                versao = excluded.versao
+                ''', (
+            pacote.get("NAME")[0],
+            "extra",
+            pacote.get("DESC")[0],
+            pacote.get("ISIZE")[0],
+            pacote.get("LICENSE")[0],
+            pacote.get("URL")[0],
+            pacote.get("VERSION")[0],
+            pacote.get("PACKAGER")[0]
+        )
+                       )
+
+    cursor.execute('''
+                        INSERT INTO pacotes_fts(pacotes_fts)
+                           VALUES ('rebuild');
+                        ''')
+
+    con.commit()
+
+
 
 
 def insertPacotesCore():
     dados = downloadCore()
+    #print(dados)
+    cursor.execute("BEGIN")
 
     for pacote in dados:
+
         cursor.execute('''
             INSERT OR REPLACE INTO pacotes (
                 nome,
@@ -65,16 +106,17 @@ def insertPacotesCore():
                 versao,
                 criadores
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(nome) DO UPDATE SET
+                versao = excluded.versao
             ''', (
-                pacote.get("NAME"),
+                pacote.get("NAME")[0],
                 "core",
-                pacote.get("DESC"),
-                pacote.get("ISIZE"),
-                pacote.get("LICENSE"),
-                pacote.get("URL"),
-                pacote.get("VERSION"),
-                pacote.get("PACKAGER")
+                pacote.get("DESC")[0],
+                pacote.get("ISIZE")[0],
+                pacote.get("LICENSE")[0],
+                pacote.get("URL")[0],
+                pacote.get("VERSION")[0],
+                pacote.get("PACKAGER")[0]
             )
         )
 
@@ -85,7 +127,6 @@ def insertPacotesCore():
 
     con.commit()
 
-    pass
 
 def insertPacotesMultilib():
     pass

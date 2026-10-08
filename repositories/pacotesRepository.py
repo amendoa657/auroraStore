@@ -25,8 +25,8 @@ def buscarPacotes(termo):
             END,
             p.popularidade DESC
     ''', (
-        termo,
-        termo,
+        f"{termo}",
+        f"{termo}",
         f'{termo}%',
         f'%{termo}%',
     ))
@@ -63,6 +63,7 @@ def buscarPopulares(limite):
         FROM pacotes_fts
         JOIN pacotes AS p
             ON p.rowid = pacotes_fts.rowid
+        WHERE pacotes_fts.repositorio="aur"
         ORDER BY
             p.popularidade DESC
         limit ?;
@@ -82,6 +83,7 @@ def buscarVotados(limite):
         FROM pacotes_fts
         JOIN pacotes AS p
             ON p.rowid = pacotes_fts.rowid
+        WHERE pacotes_fts.repositorio="aur"
         ORDER BY
             p.numeroVotos DESC
         limit ?;

@@ -6,8 +6,30 @@ urlAur = "https://aur.archlinux.org/packages-meta-v1.json.gz"
 urlCore = "https://geo.mirror.pkgbuild.com/core/os/x86_64/core.db"
 urlExtra = "https://geo.mirror.pkgbuild.com/extra/os/x86_64/extra.db"
 raiz = Path(__file__).resolve().parent.parent
-pasta = raiz / "database"
+pasta = raiz / "database" / "pacotes"
 
+
+def extractdb(arquivo):
+    pacotes = []
+
+    with tarfile.open(arquivo, "r:*") as db:
+        for arquivo in db:
+            if not arquivo.name.endswith("/desc"):
+                continue
+
+            conteudo = db.extractfile(arquivo).read().decode("utf-8")
+            dados = {}
+            campo = None
+
+            for linha in conteudo.splitlines():
+                if linha.startswith("%") and linha.endswith("%"):
+                    campo = linha.strip("%")
+                    dados[campo] = []
+                elif linha and campo:
+                    dados[campo].append(linha)
+
+            pacotes.append(dados)
+    return pacotes
 def downloadAur():
     pasta.mkdir(parents=True, exist_ok=True)
 
@@ -35,26 +57,21 @@ def downloadCore():
 
     print("Salvo em:", arquivo)
 
-    #solucao vibecodada
-    pacotes = []
+    pacotes = extractdb(arquivo)
 
-    with tarfile.open(arquivo, "r:*") as db:
-        for arquivo in db:
-            if not arquivo.name.endswith("/desc"):
-                continue
+    return pacotes
 
-            conteudo = db.extractfile(arquivo).read().decode("utf-8")
-            dados = {}
-            campo = None
+def downloadExtra():
+    arquivo = pasta / "extra.db"
 
-            for linha in conteudo.splitlines():
-                if linha.startswith("%") and linha.endswith("%"):
-                    campo = linha.strip("%")
-                    dados[campo] = []
-                elif linha and campo:
-                    dados[campo].append(linha)
+    r = requests.get(urlExtra)
+    r.raise_for_status()
 
-            pacotes.append(dados)
+    arquivo.write_bytes(r.content)
+
+    print("Salvo em:", arquivo)
+
+    pacotes = extractdb(arquivo)
 
     return pacotes
 

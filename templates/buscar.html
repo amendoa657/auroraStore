@@ -108,12 +108,10 @@
                     <div class="col-versao">{{ versao }}</div>
 
                     <div class="col-fonte">
-                        {% if modo == "pacman" %}
-                            {# pyalpm sabe de que repositório o pacote veio: pkg.db.name.
-                 O `if pacote.db` evita erro quando o item é um dict sem db. #}
-                            <span class="selo selo-oficial">{{ pacote.fonte or (pacote.db.name if pacote.db else "") or "repo" }}</span>
-                        {% else %}
+                        {% if pacote.repositorio == "aur" %}
                             <span class="selo selo-aur">AUR</span>
+                        {% else %}
+                            <span class="selo selo-oficial">{{ pacote.repositorio}}</span>
                         {% endif %}
                     </div>
                 </div>

@@ -13,11 +13,13 @@ from controllers.systemController import systemBp
 
 from system.downloadQueue import filaDeDownloads, trabalhador
 
+from database.createDatabase import insertsThread
+
 app = Flask(__name__)
 app.secret_key = "chave-secreta-paru-gui"
 app.config["ULTIMA_PESQUISA"] = ""
 
-trabalhador.start()
+
 
 app.register_blueprint(pageBp)
 app.register_blueprint(aurBp)
@@ -28,7 +30,11 @@ app.register_blueprint(pacmanBp)
 
 if __name__ == "__main__":
     config_paru = criarConfigParu()
+
     init()
+
+    trabalhador.start()
+    insertsThread.start()
 
     window = webview.create_window(
         "Aurora Store",

@@ -37,19 +37,15 @@ FROM pacotes;
 
 SELECT *
 FROM pacotes_fts
-WHERE pacotes_fts MATCH 'firefox';
+WHERE repositorio="core";
 
         SELECT p.*
         FROM pacotes_fts
         JOIN pacotes AS p
             ON p.rowid = pacotes_fts.rowid
-        WHERE pacotes_fts MATCH 'firefox'
-        ORDER BY
-            CASE
-                WHEN p.nome = 'firefox' THEN 1
-                WHEN p.nome LIKE 'firefox%' THEN 2
-                WHEN p.descricao LIKE '%firefox%' THEN 3
-                ELSE 4
-            END,
-            p.popularidade DESC
+        WHERE pacotes_fts MATCH 'nvidia' and pacotes_fts.repositorio="core"
+        ORDER BY p.popularidade DESC;
+
+
+select * from pacotes where repositorio="core";
 

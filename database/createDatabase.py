@@ -1,11 +1,11 @@
-import gzip
-import json
+import threading
+
 from pathlib import Path
 
 from database.connect import getConnection
 from database.insertDatabase import insertPacotesAur
 from database.insertDatabase import insertPacotesCore
-
+from database.insertDatabase import insertPacotesExtra
 
 con = getConnection()
 cursor = con.cursor()
@@ -40,6 +40,7 @@ def createDatabase():
         CREATE VIRTUAL TABLE IF NOT EXISTS pacotes_fts USING fts5(
             nome,
             descricao,
+            repositorio,
             content='pacotes',
             content_rowid='rowid'
         );
@@ -50,10 +51,19 @@ def createDatabase():
 
     print("Database criada.")
 
+
+
+
+def insertsPacotes():
     insertPacotesAur()
     print("Aur criada com sucesso.")
 
     insertPacotesCore()
     print("Core criada com sucesso.")
+
+    insertPacotesExtra()
+    print("Extra criada com sucesso")
+
+insertsThread = threading.Thread(target=insertsPacotes, daemon=True)
 
 
