@@ -1,0 +1,23 @@
+/* Fontes servidas pelo próprio app (static/fonts), em versão variável: um
+   arquivo por família cobre todos os pesos. Antes vinham do Google Fonts,
+   que é uma folha de estilo externa bloqueando a pintura de cada tela — e
+   sem internet a janela ficava esperando.
+
+   Space Grotesk e JetBrains Mono, licença SIL Open Font License 1.1
+   (static/fonts/LICENSE-*.txt). Subconjunto latino: cobre o português. */
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("../fonts/space-grotesk.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url("../fonts/jetbrains-mono.woff2") format("woff2");
+}

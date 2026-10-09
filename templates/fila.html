@@ -8,8 +8,10 @@
                   Linhas que começam com "==>" ganham destaque sozinhas.
     resumo  dict  {"download": "214 MiB", "disco": "+612 MiB", "tempo": "~3 min"}
 
-  Como o progresso muda no servidor, a página se recarrega sozinha enquanto
-  houver algo instalando (veja o bloco `cabeca` logo abaixo).
+  Como o progresso muda no servidor, enquanto houver algo instalando o
+  app.js busca esta mesma página a cada 2 s e troca só a lista e a saída do
+  terminal (marcador `data-fila-ao-vivo`). Sem JavaScript, o <noscript> do
+  bloco `cabeca` recarrega a página inteira.
 #}
 {% extends "base.html" %}
 {% from "_macros.html" import icone, vazio %}
@@ -19,7 +21,7 @@
 {% block titulo %}Fila de instalação — Pacotes{% endblock %}
 
 {% block cabeca %}
-  {% if instalando %}<meta http-equiv="refresh" content="2">{% endif %}
+  {% if instalando %}<noscript><meta http-equiv="refresh" content="2"></noscript>{% endif %}
 {% endblock %}
 
 {% block cabecalho %}
@@ -103,7 +105,7 @@
     {% endif %}
   </div>
 
-  <div class="coluna-terminal">
+  <div class="coluna-terminal" {{ "data-fila-ao-vivo" if instalando }}>
     <section class="terminal">
       <div class="terminal-cabecalho">
         <span class="rotulo">SAÍDA DO BUILD</span>
@@ -114,7 +116,9 @@
 
       {# A saída rola sozinha até o fim: veja .terminal-saida no CSS. #}
       <div class="terminal-saida">
-        {% for linha in saida %}
+        {# Só as últimas 400 linhas: o resto já rolou para cima e desenhar
+           um build inteiro (dezenas de milhares de linhas) trava a janela. #}
+        {% for linha in (saida | list)[-400:] %}
           {% if linha.startswith("==>") %}
             <div><span class="seta">==&gt;</span>{{ linha[3:] }}</div>
           {% else %}

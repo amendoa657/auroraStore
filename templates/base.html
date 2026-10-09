@@ -19,9 +19,9 @@
 <meta name="color-scheme" content="dark">
 <title>{% block titulo %}Pacotes{% endblock %}</title>
 <link rel="icon" href="{{ url_for('static', filename='icone.svg') }}">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="{{ url_for('static', filename='fonts/space-grotesk.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ url_for('static', filename='fonts/jetbrains-mono.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/fontes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
 <link rel="stylesheet" href="/tema.css">
 {#<link rel="stylesheet" href="{{ url_for('static', filename='css/themeAlt.css') }}"> #}
@@ -45,6 +45,16 @@
 <script>
   (function () {
     var raiz = document.documentElement;
+
+    /* O worker que desenha os pixels (fundo e transição) começa a carregar
+       já aqui, em paralelo com o resto da página; o luzes.js entrega os
+       <canvas> para ele no fim do <body>. */
+    try {
+      if ("OffscreenCanvas" in window) {
+        window.__pixels = new Worker("{{ url_for('static', filename='js/pixels.js') }}");
+      }
+    } catch (erro) {}
+
     var aqui = location.pathname + location.search;
     var repeticao = false;
     try {
@@ -62,7 +72,7 @@
       raiz.classList.contains("sem-animacoes") ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (origem && !repeticao && !calmo && Date.now() - origem.t < 3000) {
-      raiz.classList.add("revelando");
+      raiz.classList.add("revelando", "via-pixels");
       window.__origemPixels = origem;
     }
 

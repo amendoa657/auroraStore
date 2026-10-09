@@ -102,6 +102,60 @@ window.addEventListener("pagehide", () => {
   } catch (erro) {}
 });
 
+/* 8. Fila ao vivo. Enquanto algo instala, busca esta mesma página a cada 2 s
+      e troca só o que muda (lista, alvo, contagem e saída do terminal), em
+      vez de recarregar a janela inteira. A saída só desce sozinha se você
+      já estava lá embaixo. Quando a instalação acaba, para. */
+if (document.querySelector("[data-fila-ao-vivo]")) {
+  const PARTES = [".coluna-fila", ".terminal-cabecalho .alvo", ".meta-cabecalho"];
+
+  const atualizarFila = async () => {
+    let novo;
+    try {
+      const resposta = await fetch(location.href, { cache: "no-store" });
+      novo = new DOMParser().parseFromString(await resposta.text(), "text/html");
+    } catch (erro) {
+      setTimeout(atualizarFila, 4000);
+      return;
+    }
+
+    /* Trocar o HTML recria os cartões: sem isso eles "entrariam" de novo. */
+    document.documentElement.classList.add("repeticao");
+
+    for (const seletor of PARTES) {
+      const atual = document.querySelector(seletor);
+      const vindo = novo.querySelector(seletor);
+      if (atual && vindo && atual.innerHTML !== vindo.innerHTML) atual.innerHTML = vindo.innerHTML;
+    }
+
+    const saida = document.querySelector(".terminal-saida");
+    const saidaNova = novo.querySelector(".terminal-saida");
+    if (saida && saidaNova && saida.innerHTML !== saidaNova.innerHTML) {
+      const noFim = saida.scrollHeight - saida.scrollTop - saida.clientHeight < 40;
+      saida.innerHTML = saidaNova.innerHTML;
+      if (noFim) saida.scrollTop = saida.scrollHeight;
+    }
+
+    if (novo.querySelector("[data-fila-ao-vivo]")) setTimeout(atualizarFila, 2000);
+  };
+
+  setTimeout(atualizarFila, 2000);
+}
+
+/* 9. Enquanto uma área rola, ela ganha a classe `rolando` (o CSS desliga o
+      hover do conteúdo nesse meio-tempo) e perde 120ms depois de parar. */
+document.addEventListener(
+  "scroll",
+  (evento) => {
+    const area = evento.target;
+    if (!(area instanceof Element)) return;
+    if (!area.classList.contains("rolando")) area.classList.add("rolando");
+    clearTimeout(area.__fimRolagem);
+    area.__fimRolagem = setTimeout(() => area.classList.remove("rolando"), 120);
+  },
+  { capture: true, passive: true },
+);
+
 /* A saída do build começa rolada até o fim, que é onde está o que interessa. */
 const terminal = document.querySelector(".terminal-saida");
 if (terminal) {

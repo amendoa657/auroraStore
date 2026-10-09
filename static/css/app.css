@@ -577,6 +577,9 @@ mark {
 .visualizacao {
   background: transparent;
   color: var(--corTextoVisualizacao);
+  /* A área é transparente (os pontos aparecem atrás). Sem isto o Chromium
+     pode desistir de rolar na GPU e repintar o conteúdo a cada quadro. */
+  will-change: scroll-position;
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 0;
@@ -2588,19 +2591,42 @@ button.dep {
   animation-delay: calc(120ms + var(--ordem, 0) * 45ms);
 }
 
-/* Centenas de linhas de resultado não precisam de entrada individual. */
+/* Centenas de linhas de resultado não precisam de entrada individual, e os
+   lotes fora da tela (40 linhas cada, buscar.html) nem são montados até a
+   rolagem chegar neles. */
 .pilha-busca .linha-pacote:not(.cabecalho-tabela) {
   animation: none;
 }
+.lote-linhas {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 2240px;
+}
 
-/* A mesma página aberta de novo (a fila se recarrega a cada 2 s, ou clicar
-   no item do menu que já está aberto): nada entra de novo. */
+/* Durante a rolagem (classe posta pelo app.js), o conteúdo não reage ao
+   mouse: sem isso, cada quadro troca a linha que está sob o cursor e o
+   navegador recalcula o hover dela no meio da rolagem. */
+.rolando .tabela,
+.rolando .grade-cartoes,
+.rolando .coluna-fila {
+  pointer-events: none;
+}
+
+/* Nada entra animado quando:
+   - é a mesma página aberta de novo (clicar no item do menu já aberto, ou
+     a fila trocando o próprio conteúdo);
+   - a página chegou pela transição de pixels, que já faz a entrada. */
 .repeticao .grade-cartoes > *,
 .repeticao .item-fila,
 .repeticao .linha-pacote,
 .repeticao .destaque,
 .repeticao .faixa-atualizacoes,
-.repeticao .secao > .cartao {
+.repeticao .secao > .cartao,
+.via-pixels .grade-cartoes > *,
+.via-pixels .item-fila,
+.via-pixels .linha-pacote,
+.via-pixels .destaque,
+.via-pixels .faixa-atualizacoes,
+.via-pixels .secao > .cartao {
   animation: none;
 }
 

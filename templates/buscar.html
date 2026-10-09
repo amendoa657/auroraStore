@@ -97,7 +97,13 @@
                 <div class="col-fonte">FONTE</div>
             </div>
 
-            {% for pacote in resultados %}
+            {# As linhas vão em lotes de 40: o navegador pula a montagem dos lotes
+               fora da tela (content-visibility no CSS). Por lote, e não por
+               linha, porque vigiar centenas de linhas uma a uma custa mais na
+               rolagem do que montar todas. #}
+            {% for lote in resultados | batch(40) %}
+              <div class="lote-linhas">
+              {% for pacote in lote %}
                 {# Lê os dois formatos: Name/Description/Version da AUR ou
            name/desc/version do pyalpm. #}
                 {% set nome = pacote.Name or pacote.nome %}
@@ -124,6 +130,8 @@
                         {% endif %}
                     </div>
                 </div>
+              {% endfor %}
+              </div>
 
                 {# O else de um for roda quando a lista está vazia. #}
             {% else %}

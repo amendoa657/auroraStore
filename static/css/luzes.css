@@ -1,14 +1,17 @@
 /* Fundo de pontos.
 
-   Uma matriz de pixels atrás do conteúdo, desenhada no <canvas> pelo
-   luzes.js. Ilhas de cor sólida (as três cores do tema, sem mistura entre
+   Uma matriz de pixels atrás do conteúdo, desenhada no <canvas> por um Web
+   Worker (pixels.js, ligado pelo luzes.js). Ilhas de cor sólida (as três cores do tema, sem mistura entre
    elas) passam devagar pela grade, como numa separação de cores de
    impressão. Os blocos da interface são opacos: os pontos aparecem só nos
    vãos entre eles. */
 
+/* Só na coluna do conteúdo: atrás do menu não aparece, não precisa desenhar. */
 .fundo {
   position: absolute;
   inset: 0;
+  grid-column: -2 / -1;
+  grid-row: 1;
   z-index: 0;
   pointer-events: none;
   background: var(--superficieBase);
@@ -23,7 +26,7 @@
 /* Cortina da transição entre páginas. Ocupa só a área de conteúdo (a
    coluna do <main> na grade do .corpo): menu e cabeçalho ficam parados.
    Nasce cobrindo tudo com a cor do fundo; o luzes.js desenha os pixels por
-   cima e tira essa cor no primeiro quadro. */
+   cima e avisa quando já pode tirar essa cor. */
 .transicao-pixels {
   display: none;
   position: absolute;
