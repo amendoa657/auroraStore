@@ -1,10 +1,10 @@
 <div align="center">
 
-# Aurora Store
+# Mosaic
 
 ### Uma interface desktop para descobrir, instalar e acompanhar pacotes do Arch Linux.
 
-<img src="assetsReadme/aurora-home.png" alt="Aurora Store — tela Descobrir" width="100%">
+<img src="assetsReadme/aurora-home.png" alt="Mosaic — tela Descobrir" width="100%">
 
 <p>
   <a href="#o-produto-em-uma-olhada">Produto</a> ·
@@ -14,7 +14,7 @@
 
 </div>
 
-> A Aurora Store coloca o `paru` atrás de uma interface calma, rápida e legível — com busca, detalhes da AUR, instalação e saída do build no mesmo fluxo.
+> O Mosaic coloca o `paru` atrás de uma interface calma, rápida e legível — com busca, detalhes da AUR, instalação e saída do build no mesmo fluxo.
 
 <video src="assetsReadme/showcase.mp4" controls width="100%"></video>
 
@@ -26,7 +26,9 @@
 
 ### A linguagem visual
 
-Tema escuro em tons de ameixa, verde suave para ações principais, vermelho reservado para alertas da AUR e tipografia combinando **Space Grotesk** com **JetBrains Mono**. A navegação lateral deixa as fontes e os estados do sistema sempre à mão sem competir com o conteúdo.
+Cada pacote é uma peça do mosaico. A marca são quatro blocos, um em cada cor do tema; atrás do conteúdo, uma grade de pixels em retícula muda de cor devagar, e a troca de tela é uma onda desses mesmos pixels saindo de onde foi o clique. Os botões são teclas: cor chapada e uma borda que some quando a tecla desce.
+
+As cores vêm do wallpaper, geradas pelo [Matugen](https://github.com/InioX/matugen) em `~/.config/aurora-store/colors.css` — nenhuma cor é fixa no código. Tipografia em **Space Grotesk** com **JetBrains Mono**, servidas pelo próprio app.
 
 ## Telas
 
@@ -35,31 +37,31 @@ Tema escuro em tons de ameixa, verde suave para ações principais, vermelho res
     <td width="50%">
       <strong>Descobrir</strong><br>
       <sub>O ponto de entrada: destaque e descoberta rápida.</sub><br><br>
-      <img src="assetsReadme/aurora-home.png" alt="Tela Descobrir da Aurora Store" width="100%">
+      <img src="assetsReadme/aurora-home.png" alt="Tela Descobrir do Mosaic" width="100%">
     </td>
     <td width="50%">
       <strong>Buscar</strong><br>
       <sub>Resultados da AUR com versão, descrição e fonte.</sub><br><br>
-      <img src="assetsReadme/aurora-search.png" alt="Tela de busca da Aurora Store" width="100%">
+      <img src="assetsReadme/aurora-search.png" alt="Tela de busca do Mosaic" width="100%">
     </td>
   </tr>
   <tr>
     <td>
       <strong>Detalhes do pacote</strong><br>
       <sub>PKGBUILD, dependências, votos e o aviso da AUR no lugar certo.</sub><br><br>
-      <img src="assetsReadme/aurora-package.png" alt="Detalhes do pacote paru na Aurora Store" width="100%">
+      <img src="assetsReadme/aurora-package.png" alt="Detalhes do pacote paru no Mosaic" width="100%">
     </td>
     <td>
       <strong>Fila de instalação</strong><br>
       <sub>Uma área dedicada para acompanhar o build e a saída do terminal.</sub><br><br>
-      <img src="assetsReadme/aurora-queue.png" alt="Fila de instalação da Aurora Store" width="100%">
+      <img src="assetsReadme/aurora-queue.png" alt="Fila de instalação do Mosaic" width="100%">
     </td>
   </tr>
   <tr>
     <td>
       <strong>Atualizações</strong><br>
       <sub>Estado do sistema e ação de verificação sem ruído.</sub><br><br>
-      <img src="assetsReadme/aurora-updates.png" alt="Tela de atualizações da Aurora Store" width="100%">
+      <img src="assetsReadme/aurora-updates.png" alt="Tela de atualizações do Mosaic" width="100%">
     </td>
     <td valign="top">
       <strong>O fluxo em cinco passos</strong>
@@ -93,7 +95,7 @@ Tema escuro em tons de ameixa, verde suave para ações principais, vermelho res
 | Interface desktop | pywebview |
 | Pacotes | paru, AUR e repositórios oficiais |
 | Dados | SQLite + busca full-text |
-| Estilo | HTML, CSS, Space Grotesk e JetBrains Mono |
+| Estilo | HTML, CSS, Canvas em Web Worker, Space Grotesk e JetBrains Mono |
 | Privilégios | Polkit / `pkexec` |
 
 ## Rodando localmente

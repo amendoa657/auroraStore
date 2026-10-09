@@ -17,7 +17,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>{% block titulo %}Pacotes{% endblock %}</title>
+<title>{% block titulo %}Mosaic{% endblock %}</title>
 <link rel="icon" href="{{ url_for('static', filename='icone.svg') }}">
 <link rel="preload" href="{{ url_for('static', filename='fonts/space-grotesk.woff2') }}" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="{{ url_for('static', filename='fonts/jetbrains-mono.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -58,8 +58,8 @@
     var aqui = location.pathname + location.search;
     var repeticao = false;
     try {
-      repeticao = sessionStorage.getItem("aurora:ultima") === aqui;
-      sessionStorage.setItem("aurora:ultima", aqui);
+      repeticao = sessionStorage.getItem("mosaic:ultima") === aqui;
+      sessionStorage.setItem("mosaic:ultima", aqui);
     } catch (erro) {}
     if (repeticao) raiz.classList.add("repeticao");
 
@@ -94,7 +94,7 @@
   #}
   <header class="barra-cabecalho">
     {% block cabecalho %}
-      <a class="marca" href="/"><i class="marca-glifo"></i><span>Pacotes</span></a>
+      <a class="marca" href="/"><i class="marca-glifo"></i><span>Mosaic</span></a>
 
       <form class="busca-envolucro" action="/buscar" method="get" role="search">
         <i class="lupa" aria-hidden="true"></i>

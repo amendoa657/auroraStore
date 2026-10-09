@@ -40,7 +40,7 @@ if __name__ == "__main__":
     insertsThread.start()
 
     window = webview.create_window(
-        "Aurora Store",
+        "Mosaic",
         app,
         width=1200,
         height=800,

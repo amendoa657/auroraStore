@@ -18,7 +18,7 @@
 
 {% set pagina = "fila" %}
 {% set instalando = fila | selectattr("situacao", "equalto", "instalando") | list | length > 0 %}
-{% block titulo %}Fila de instalação — Pacotes{% endblock %}
+{% block titulo %}Fila de instalação — Mosaic{% endblock %}
 
 {% block cabeca %}
   {% if instalando %}<noscript><meta http-equiv="refresh" content="2"></noscript>{% endif %}
