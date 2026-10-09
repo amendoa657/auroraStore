@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assetsReadme/mosaic-marca.svg" alt="" width="72">
+<img src="assetsReadme/mosaic-marca.gif" alt="" width="72">
 
 # Mosaic
 
@@ -26,9 +26,25 @@
 
 O Mosaic coloca o `paru` atrás de uma interface calma, rápida e legível. Busca, detalhes da AUR, PKGBUILD, instalação e a saída do build ficam no mesmo fluxo, sem abrir terminal.
 
-| Descobrir | Buscar | Instalar com contexto |
-| --- | --- | --- |
-| Destaque e pacotes populares e mais votados da AUR. | AUR e repositórios oficiais numa busca só, local e instantânea. | Aviso de pacote da AUR, PKGBUILD, dependências e o build ao vivo. |
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <img src="assetsReadme/mosaic-descobrir.gif" alt="Cartões de pacotes caem como teclas e o cursor coloca o paru na fila" width="100%"><br>
+      <strong>Descobrir</strong><br>
+      <sub>Destaque e pacotes populares e mais votados da AUR.</sub>
+    </td>
+    <td width="33%" valign="top">
+      <img src="assetsReadme/mosaic-buscar.gif" alt="A tecla / abre a busca, firefox é digitado e 745 resultados aparecem" width="100%"><br>
+      <strong>Buscar</strong><br>
+      <sub>AUR e repositórios oficiais numa busca só, local e instantânea.</sub>
+    </td>
+    <td width="33%" valign="top">
+      <img src="assetsReadme/mosaic-instalar.gif" alt="O aviso da AUR aparece, o botão Instalar afunda e o build avança até instalado" width="100%"><br>
+      <strong>Instalar com contexto</strong><br>
+      <sub>Aviso de pacote da AUR, PKGBUILD, dependências e o build ao vivo.</sub>
+    </td>
+  </tr>
+</table>
 
 ## Telas
 
@@ -136,6 +152,8 @@ flask --app app:app run
 ```
 
 ## Tema com o Matugen
+
+<img src="assetsReadme/mosaic-tema.gif" alt="O wallpaper troca, o colors.css ganha as cores novas e o app se repinta numa onda de pixels" width="100%">
 
 O Mosaic lê as cores de `~/.config/mosaic-store/colors.css`. Aponte um template do Matugen para esse arquivo:
 

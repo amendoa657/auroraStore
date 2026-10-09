@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Mosaic — GIFs do README</title>
+<style>
+  html, body { margin: 0; background: transparent; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="gif"></canvas>
+<script type="module">
+  import { FPS, GIFS, preparar } from "./gifs.js";
+  // O render escolhe um GIF com `escolher(nome)` e pede quadro a quadro com `seek(t)`.
+  const tela = document.getElementById("gif");
+  const c = tela.getContext("2d");
+  let atual = null;
+  window.listar = () => Object.entries(GIFS).map(([nome, g]) => ({ nome, w: g.w, h: g.h, duracao: g.duracao, transparente: !!g.transparente, fps: FPS }));
+  window.escolher = (nome) => {
+    atual = GIFS[nome];
+    tela.width = atual.w;
+    tela.height = atual.h;
+  };
+  window.seek = (t) => {
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    atual.desenhar(c, t);
+  };
+  window.quadro = () => tela.toDataURL("image/png");
+  window.pronto = preparar().then(() => {
+    const q = new URLSearchParams(location.search);
+    if (q.get("gif")) {
+      window.escolher(q.get("gif"));
+      window.seek(Number(q.get("t") || 0));
+    }
+    return true;
+  });
+</script>
+</body>
+</html>

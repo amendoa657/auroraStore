@@ -3,6 +3,7 @@
 //   node render.mjs                 trilha + 1800 quadros -> 01-teste.mp4 (nesta pasta)
 //   node render.mjs --folha         uma imagem por batida, em folhas de contato (build/folha-*.png)
 //   node render.mjs --quadro 13.2   um quadro em tamanho cheio (build/quadro-13.2.png)
+//   node render.mjs --gifs [nome]   os GIFs do README (gifs.js) -> ../assetsReadme/mosaic-<nome>.gif
 //
 // A trilha é sintetizada pelo audio.mjs, normalizada para -14 LUFS pelo
 // ffmpeg (loudnorm em duas passadas) e o vídeo sai em H.264 yuv420p, CRF 16.
@@ -25,6 +26,9 @@ const args = process.argv.slice(2);
 const modoFolha = args.includes("--folha");
 const iQuadro = args.indexOf("--quadro");
 const tQuadro = iQuadro >= 0 ? Number(args[iQuadro + 1]) : null;
+const iGifs = args.indexOf("--gifs");
+const modoGifs = iGifs >= 0;
+const soEstesGifs = modoGifs ? args.slice(iGifs + 1).filter((a) => !a.startsWith("--")) : [];
 
 function rodar(cmd, argv, { mostrar = false } = {}) {
   const r = spawnSync(cmd, argv, { cwd: AQUI, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
@@ -79,14 +83,14 @@ function servir() {
   });
 }
 
-async function abrir(porta) {
+async function abrir(porta, arquivo = "film.html") {
   const nav = await chromium.launch({ executablePath: CHROME, args: ["--force-color-profile=srgb", "--font-render-hinting=none"] });
   const pagina = await nav.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   const erros = [];
   pagina.on("pageerror", (e) => erros.push(e.message));
   pagina.on("console", (m) => m.type() === "error" && !m.text().startsWith("Failed to load resource") && erros.push(m.text()));
   pagina.on("response", (r) => r.status() >= 400 && !r.url().endsWith("favicon.ico") && erros.push(`${r.status()} ${r.url()}`));
-  await pagina.goto(`http://127.0.0.1:${porta}/motion/film.html`);
+  await pagina.goto(`http://127.0.0.1:${porta}/motion/${arquivo}`);
   await pagina.evaluate(() => window.pronto);
   return { nav, pagina, erros };
 }
@@ -169,14 +173,54 @@ async function filme(pagina, erros, audio) {
   console.log(`pronto: ${SAIDA}`);
 }
 
+/* ---------- GIFs do README ---------- */
+// Paleta de 256 cores sem pontilhado (as cores do app são chapadas) e só o
+// retângulo que mudou em cada quadro: o campo de pixels anda em pixel
+// inteiro, então quase tudo fica igual de um quadro para o outro.
+async function gifs(pagina, erros) {
+  const lista = await pagina.evaluate(() => window.listar());
+  for (const g of lista) {
+    if (soEstesGifs.length && !soEstesGifs.includes(g.nome)) continue;
+    await pagina.evaluate((nome) => window.escolher(nome), g.nome);
+    // O laço tem que emendar: o quadro em t = duração é o mesmo de t = 0.
+    const emenda = await pagina.evaluate((d) => {
+      window.seek(0);
+      const a = window.quadro();
+      window.seek(d);
+      return a === window.quadro();
+    }, g.duracao);
+    if (!emenda) console.warn(`aviso: ${g.nome} não emenda (quadro final diferente do inicial)`);
+    const arq = path.join(RAIZ, "assetsReadme", `mosaic-${g.nome}.gif`);
+    const filtro = `[0:v]split[a][b];[a]palettegen=max_colors=256:stats_mode=full[p];[b][p]paletteuse=dither=none:diff_mode=rectangle`;
+    const ff = spawn("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", "-f", "image2pipe", "-framerate", String(g.fps), "-c:v", "png", "-i", "-", "-filter_complex", filtro, "-loop", "0", arq], { stdio: ["pipe", "inherit", "inherit"] });
+    const fim = new Promise((ok, falha) => ff.on("close", (s) => (s === 0 ? ok() : falha(new Error(`ffmpeg saiu com ${s}`)))));
+    const total = Math.round(g.duracao * g.fps);
+    for (let i = 0; i < total; i += 1) {
+      const url = await pagina.evaluate((t) => {
+        window.seek(t);
+        return window.quadro();
+      }, i / g.fps);
+      if (!ff.stdin.write(Buffer.from(url.slice(url.indexOf(",") + 1), "base64"))) await new Promise((ok) => ff.stdin.once("drain", ok));
+    }
+    ff.stdin.end();
+    conferir(erros, `gif ${g.nome}`);
+    await fim;
+    // Folha de contato tirada do próprio GIF, para olhar o resultado final.
+    const passo = Math.max(1, Math.floor(total / 12));
+    rodar("ffmpeg", ["-hide_banner", "-loglevel", "error", "-y", "-i", arq, "-vf", `select='not(mod(n\\,${passo}))',scale=${Math.round(g.w / 2)}:-1,tile=4x3`, "-frames:v", "1", path.join(BUILD, `folha-gif-${g.nome}.png`)]);
+    console.log(`${path.relative(RAIZ, arq)}: ${g.w}x${g.h}, ${total} quadros, ${(fs.statSync(arq).size / 1024).toFixed(0)} KB${emenda ? ", emenda" : ""}`);
+  }
+}
+
 /* ---------- Principal ---------- */
 fs.mkdirSync(BUILD, { recursive: true });
-const audio = modoFolha || tQuadro !== null ? (rodar("node", ["audio.mjs"], { mostrar: true }), null) : trilha();
+const audio = modoGifs ? null : modoFolha || tQuadro !== null ? (rodar("node", ["audio.mjs"], { mostrar: true }), null) : trilha();
 const servidor = await servir();
-const { nav, pagina, erros } = await abrir(servidor.address().port);
+const { nav, pagina, erros } = await abrir(servidor.address().port, modoGifs ? "gifs.html" : "film.html");
 conferir(erros, "carregar");
 try {
-  if (modoFolha) await folhas(pagina, erros);
+  if (modoGifs) await gifs(pagina, erros);
+  else if (modoFolha) await folhas(pagina, erros);
   else if (tQuadro !== null) await umQuadro(pagina, erros, tQuadro);
   else await filme(pagina, erros, audio);
 } finally {
