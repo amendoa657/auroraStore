@@ -13,7 +13,6 @@
 <p>
   <a href="#o-que-é">O que é</a> ·
   <a href="#telas">Telas</a> ·
-  <a href="#linguagem-visual">Linguagem visual</a> ·
   <a href="#rodando-localmente">Rodando localmente</a> ·
   <a href="#tema-com-o-matugen">Tema</a>
 </p>
@@ -74,16 +73,6 @@ O Mosaic coloca o `paru` atrás de uma interface calma, rápida e legível. Busc
 
 <sub>As telas da fila, das atualizações e do PKGBUILD foram capturadas com dados de exemplo.</sub>
 
-## Linguagem visual
-
-Cada pacote é uma peça do mosaico.
-
-- **A marca** são quatro blocos, um em cada cor do tema. No hover, o bloco gira um quarto de volta e as cores trocam de lugar.
-- **O fundo** é uma grade de pixels em retícula. Três campos de cor, um por acento do tema, passam devagar por ela, e a força de cada campo vira o tamanho do ponto, como numa separação de cores de impressão. Perto do cursor, os pontos crescem.
-- **A troca de tela** é uma onda desses mesmos pixels que sai de onde foi o clique (ou do centro, quando foi o teclado) e revela a página nova. A pílula do menu desliza até o item escolhido.
-- **Os botões são teclas**: cor chapada e uma borda de baixo que some quando a tecla desce. Sem degradê e sem brilho.
-- **As cores vêm do wallpaper.** Nenhuma cor é fixa no código: tudo sai das variáveis geradas pelo [Matugen](https://github.com/InioX/matugen) (veja [Tema](#tema-com-o-matugen)).
-- **Tipografia**: Space Grotesk para a interface e JetBrains Mono para nomes, versões e o terminal.
 
 ### Leve de propósito
 
