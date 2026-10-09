@@ -1,17 +1,15 @@
 from pathlib import Path
 
+from config.downloadFromMirrors import downloadAur, downloadCore, downloadExtra
 from database.connect import getConnection
 
-from config.downloadFromMirrors import downloadAur
-from config.downloadFromMirrors import downloadCore
-from config.downloadFromMirrors import downloadExtra
-
 con = getConnection()
-cursor = con.cursor()
+#cursor = con.cursor()
 
 raiz = Path(__file__).resolve().parent.parent
 #TIRAR O IGNORE PARA A VERSAO ATUALIZAR!!!!!!!!!!!!!
-def insertPacotesAur():
+def insertPacotesAur(con):
+    cursor = con.cursor()
     dados = downloadAur()
 
     for pacote in dados:
@@ -47,7 +45,8 @@ def insertPacotesAur():
 
     con.commit()
 #TIRAR O IGNORE PARA A VERSAO ATUALIZAR!!!!!!!!!!!!!
-def insertPacotesExtra():
+def insertPacotesExtra(con):
+    cursor = con.cursor()
     dados = downloadExtra()
     # print(dados)
 
@@ -88,7 +87,8 @@ def insertPacotesExtra():
 
 
 
-def insertPacotesCore():
+def insertPacotesCore(con):
+    cursor = con.cursor()
     dados = downloadCore()
     #print(dados)
     cursor.execute("BEGIN")

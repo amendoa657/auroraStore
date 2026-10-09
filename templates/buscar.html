@@ -24,13 +24,15 @@
 
 {% block cabeca %}
     <style>
-        /* Sem as colunas de popularidade e de botão, a linha só precisa de três. */
-        .linha-pacote { grid-template-columns: minmax(0, 1fr) 112px 92px; }
+
+        .linha-pacote { grid-template-columns: minmax(0, 1fr) 112px 45px 92px; }
         @media (max-width: 720px) {
             .linha-pacote { grid-template-columns: minmax(0, 1fr); }
         }
         /* Os dois modos ficam embaixo do campo, visíveis antes e depois de buscar. */
         .modos-busca { display: flex; gap: 7px; justify-content: center; margin-top: 12px; }
+
+
     </style>
 {% endblock %}
 
@@ -89,6 +91,7 @@
             <div class="linha-pacote cabecalho-tabela">
                 <div>PACOTE</div>
                 <div class="col-versao">VERSÃO</div>
+                <div class="col-fonte">VOTOS</div>
                 <div class="col-fonte">FONTE</div>
             </div>
 
@@ -106,6 +109,10 @@
                     </a>
 
                     <div class="col-versao">{{ versao }}</div>
+
+                    <div class="col-votos">
+                      {{pacote.numeroVotos or 0}}  
+                    </div>
 
                     <div class="col-fonte">
                         {% if pacote.repositorio == "aur" %}

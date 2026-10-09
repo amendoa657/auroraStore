@@ -1,19 +1,21 @@
+import os
+
+os.environ["PYWEBVIEW_GUI"] = "qt"
+os.environ.setdefault("QT_QPA_PLATFORM", "wayland")
+
 import webview
 from flask import Flask
 
-from config.paru import criarConfigParu
 from config.init import init
+from config.paru import criarConfigParu
+
 #from config.downloadFromMirrors import downloadAur
-
-
 from controllers.aurController import aurBp
 from controllers.pacmanController import pacmanBp
 from controllers.pageController import pageBp
 from controllers.systemController import systemBp
-
-from system.downloadQueue import filaDeDownloads, trabalhador
-
 from database.createDatabase import insertsThread
+from system.downloadQueue import filaDeDownloads, trabalhador
 
 app = Flask(__name__)
 app.secret_key = "chave-secreta-paru-gui"
@@ -43,7 +45,7 @@ if __name__ == "__main__":
         height=800,
         min_size=(900, 600),
     )
-    app.run(debug=True)
+    #app.run(debug=True, use_reloader=False)
 
 
-    #webview.start(debug=False)
+    webview.start(debug=False)

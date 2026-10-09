@@ -23,9 +23,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
-{# <link rel="stylesheet" href="/tema.css"> #}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/themeAlt.css') }}">
+<link rel="stylesheet" href="/tema.css">
+{#<link rel="stylesheet" href="{{ url_for('static', filename='css/themeAlt.css') }}"> #}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/luzes.css') }}">
 
 {# Paleta do usuário, salva em Configurações e aplicada por cima do tema.
    É CSS colado por quem usa o programa, então vai cru mesmo (| safe). #}
@@ -108,7 +109,7 @@
       </nav>
     {% endblock %}
 
-    <main class="visualizacao {% block classe_conteudo %}{% endblock %}">
+    <main class="visualizacao {% block classe_conteudo %}{% endblock %}" data-fundo-luzes>
       {% block conteudo %}{% endblock %}
     </main>
 
@@ -151,5 +152,6 @@
 {% endwith %}
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/luzes.js') }}"></script>
 </body>
 </html>

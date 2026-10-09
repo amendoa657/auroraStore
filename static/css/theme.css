@@ -4,13 +4,21 @@
   --corTextoDestaque: #003823;
   --corFundoDestaque: #86d7ac;
 
+  /* Fallbacks; o arquivo do Matugen substitui estes valores em runtime. */
+  --corAcentoSecundario: #e9b9d3;
+  --corTextoAcentoSecundario: #ffd8eb;
+  --corFundoAcentoSecundario: #5f3c51;
+  --corAcentoTerciario: #b5c5f9;
+  --corTextoAcentoTerciario: #dae2ff;
+  --corFundoAcentoTerciario: #354571;
+
   --corFundoDestrutivo: #93000a;
   --corTextoDestrutivo: #ffdad6;
   --corDestrutiva: #ffb4ab;
 
-  --corFundoSucesso: #374B3E;
-  --corTextoSucesso: #D1E9D6;
-  --corSucesso: #B5CCBA;
+  --corFundoSucesso: var(--corFundoAcentoTerciario);
+  --corTextoSucesso: var(--corTextoAcentoTerciario);
+  --corSucesso: var(--corAcentoTerciario);
 
   /* Superfícies principais */
   --corFundoJanela: #14121a;
@@ -53,7 +61,20 @@
   --corDecorativa:      color-mix(in srgb, var(--corTextoJanela) 26%, transparent);
   --corFocoContorno:    var(--corDestaque);
 
+  --corBordaDestaque:   color-mix(in srgb, var(--corDestaque) 48%, transparent);
+  --corBordaSecundaria: color-mix(in srgb, var(--corAcentoSecundario) 44%, transparent);
+  --corBordaTerciaria:  color-mix(in srgb, var(--corAcentoTerciario) 44%, transparent);
+
   --corFundoDestaqueSuave:   color-mix(in srgb, var(--corDestaque) 16%, transparent);
+  --corFundoSecundarioSuave: color-mix(in srgb, var(--corAcentoSecundario) 20%, transparent);
+  --corFundoTerciarioSuave:  color-mix(in srgb, var(--corAcentoTerciario) 20%, transparent);
+  --corLuzMista:             color-mix(in srgb, var(--corAcentoSecundario) 54%, var(--corAcentoTerciario));
+  --corLuzQuente:            color-mix(in srgb, var(--corDestaque) 58%, var(--corAcentoSecundario));
+  --corBrilhoFundoPrimario:   color-mix(in srgb, var(--corDestaque) 18%, transparent);
+  --corBrilhoFundoSecundario: color-mix(in srgb, var(--corAcentoSecundario) 23%, transparent);
+  --corBrilhoFundoTerciario:  color-mix(in srgb, var(--corAcentoTerciario) 21%, transparent);
+  --corFundoCartaoHover:     color-mix(in srgb, var(--corAcentoSecundario) 8%, var(--corFundoCartao));
+  --corSombraColorida:       color-mix(in srgb, var(--corAcentoTerciario) 24%, transparent);
   --corFundoDestrutivoSuave: color-mix(in srgb, var(--corFundoDestrutivo) 42%, transparent);
   --corPlaceholderA: color-mix(in srgb, var(--corTextoJanela) 12%, var(--corFundoCartao));
   --corPlaceholderB: color-mix(in srgb, var(--corTextoJanela) 5%, var(--corFundoCartao));

@@ -1,11 +1,12 @@
 import threading
-
 from pathlib import Path
 
 from database.connect import getConnection
-from database.insertDatabase import insertPacotesAur
-from database.insertDatabase import insertPacotesCore
-from database.insertDatabase import insertPacotesExtra
+from database.insertDatabase import (
+    insertPacotesAur,
+    insertPacotesCore,
+    insertPacotesExtra,
+)
 
 con = getConnection()
 cursor = con.cursor()
@@ -55,13 +56,15 @@ def createDatabase():
 
 
 def insertsPacotes():
-    insertPacotesAur()
+    con = getConnection()
+
+    insertPacotesAur(con)
     print("Aur criada com sucesso.")
 
-    insertPacotesCore()
+    insertPacotesCore(con)
     print("Core criada com sucesso.")
 
-    insertPacotesExtra()
+    insertPacotesExtra(con)
     print("Extra criada com sucesso")
 
 insertsThread = threading.Thread(target=insertsPacotes, daemon=True)

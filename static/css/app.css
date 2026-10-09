@@ -6,9 +6,16 @@
 *::after {
   box-sizing: border-box;
 }
+
+html {
+  --escala-interface: 1.1;
+  zoom: var(--escala-interface);
+}
+
 html,
 body {
   height: 100%;
+  overflow: hidden;
 }
 body {
   margin: 0;
@@ -75,9 +82,9 @@ mark {
 .janela {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  height: 100vh;
-  height: 100dvh;
-  min-height: 420px;
+  height: calc(100vh / var(--escala-interface));
+  height: calc(100dvh / var(--escala-interface));
+  min-height: calc(420px / var(--escala-interface));
   background: var(--corFundoJanela);
   overflow: hidden;
 }
@@ -96,12 +103,14 @@ mark {
   display: flex;
   align-items: center;
   gap: 16px;
-  min-height: 46px;
+  min-height: 47px;
   padding: 0 12px 0 16px;
   background: var(--corFundoBarraCabecalho);
   color: var(--corTextoBarraCabecalho);
   position: relative;
   z-index: 30;
+  box-shadow: 0 1px 0 var(--corBordaDestaque);
+  border-bottom: 1px solid var(--corBordaSecundaria);
 }
 .marca {
   display: flex;
@@ -289,7 +298,13 @@ mark {
   flex-direction: column;
   gap: 2px;
   padding: 12px 10px;
-  background: var(--corFundoBarraLateral);
+  background:
+    radial-gradient(
+      circle at 0% 12%,
+      var(--corBrilhoFundoSecundario),
+      transparent 34%
+    ),
+    var(--corFundoBarraLateral);
   color: var(--corTextoBarraLateral);
   border-right: 1px solid var(--corBordaBarraLateral);
   overflow-y: auto;
@@ -308,7 +323,7 @@ mark {
     color 0.16s;
 }
 .item-lateral:hover {
-  background: var(--corFundoBarraLateralSecundaria);
+  background: var(--corFundoSecundarioSuave);
   color: var(--corTextoBarraLateral);
 }
 .item-lateral.ativo {
@@ -405,6 +420,7 @@ mark {
 }
 .fonte-repo.ligada {
   opacity: 1;
+  background: var(--corFundoSecundarioSuave);
 }
 .fonte-repo:hover {
   background: var(--corFundoPopUp);
@@ -473,7 +489,23 @@ mark {
 
 /* ---------- Área de conteúdo ---------- */
 .visualizacao {
-  background: var(--corFundoVisualizacao);
+  background:
+    radial-gradient(
+      circle at 8% 8%,
+      var(--corBrilhoFundoPrimario),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 92% 24%,
+      var(--corBrilhoFundoSecundario),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 56% 108%,
+      var(--corBrilhoFundoTerciario),
+      transparent 36%
+    ),
+    var(--corFundoVisualizacao);
   color: var(--corTextoVisualizacao);
   overflow-y: auto;
   overflow-x: hidden;
@@ -556,6 +588,7 @@ mark {
 .btn-primario {
   background: var(--corFundoDestaque);
   color: var(--corTextoDestaque);
+  box-shadow: 0 5px 18px var(--corFundoDestaqueSuave);
 }
 .btn-primario:hover {
   background: color-mix(
@@ -680,6 +713,7 @@ mark {
   color: var(--corTextoCartao);
   border-radius: var(--raio-g);
   padding: 15px;
+  border: 1px solid var(--corBordaTerciaria);
 }
 .grade-cartoes {
   display: grid;
@@ -749,12 +783,9 @@ a.cartao:hover,
 .cartao-categoria:hover,
 .cartao-indice:hover {
   transform: translateY(-2px);
-  background: color-mix(
-    in srgb,
-    var(--corTextoJanela) 5%,
-    var(--corFundoCartao)
-  );
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+  background: var(--corFundoCartaoHover);
+  border-color: var(--corBordaSecundaria);
+  box-shadow: 0 10px 26px var(--corSombraColorida);
 }
 .cartao-indice {
   color: inherit;
@@ -850,7 +881,14 @@ a.cartao:hover,
   gap: 20px;
   padding: 22px;
   border-radius: 14px;
-  background: var(--corFundoCartao);
+  background: linear-gradient(
+    120deg,
+    var(--corFundoCartao) 0%,
+    var(--corFundoSecundarioSuave) 58%,
+    var(--corFundoTerciarioSuave) 100%
+  );
+  border: 1px solid var(--corBordaSecundaria);
+  box-shadow: 0 12px 30px var(--corSombraColorida);
 }
 .destaque.deslizando-direita {
   animation: deslizar 0.42s cubic-bezier(0.2, 0.8, 0.3, 1);
@@ -1165,8 +1203,12 @@ a.cartao:hover,
   display: none;
 }
 /* Na busca quem gruda no topo é a barra de busca, não a de filtros. */
-.pilha-busca .barra-filtros {
-  position: static;
+.pilha-busca .barra-filtros,
+.cabecalho-tabela {
+  position: sticky;
+  top: 110px;
+  z-index: 99;
+  background: var(--corFundoVisualizacao);
 }
 
 /* ---------- Filtros ---------- */
@@ -1329,6 +1371,7 @@ a.cartao:hover,
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .col-pop {
   display: flex;
   align-items: center;
@@ -1372,7 +1415,7 @@ a.cartao:hover,
 .barra-progresso > i {
   display: block;
   height: 100%;
-  background: var(--corDestaque);
+  background: linear-gradient(90deg, var(--corDestaque), var(--corAcentoSecundario), var(--corAcentoTerciario));
   transition: width 0.28s cubic-bezier(0.3, 0.7, 0.4, 1);
 }
 .barra-progresso.alta {
