@@ -1,133 +1,28 @@
-/* Aurora: o fundo vivo atrás do conteúdo.
+/* Fundo de pontos.
 
-   Cinco manchas de luz, cada uma pintada uma única vez como um gradiente
-   radial. Elas só se movem por `transform`, então o navegador as anima na
-   GPU sem repintar nada — o conteúdo por cima rola leve.
+   Uma matriz de pixels atrás do conteúdo, desenhada no <canvas> pelo
+   luzes.js. Ilhas de cor sólida (as três cores do tema, sem mistura entre
+   elas) passam devagar pela grade, como numa separação de cores de
+   impressão. Os blocos da interface são opacos: os pontos aparecem só nos
+   vãos entre eles. */
 
-   A fase de cada mancha vem do relógio (veja o script no <head> da
-   base.html): trocar de página ou recarregar continua o movimento de onde
-   estava, sem pular. */
-
-.aurora {
+.fundo {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
   pointer-events: none;
-  contain: strict;
-  background:
-    radial-gradient(120% 90% at 50% -10%, transparent 40%, color-mix(in oklab, var(--superficieBase) 70%, transparent) 100%),
-    var(--superficieBase);
+  background: var(--superficieBase);
 }
 
-/* O campo inteiro desliza alguns pixels com o ponteiro (luzes.js). */
-.aurora-campo {
-  position: absolute;
-  inset: -40px;
-  will-change: transform;
+.fundo-pontos {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.aurora-bolha {
-  position: absolute;
-  aspect-ratio: 1.35;
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    var(--cor) 0%,
-    color-mix(in oklab, var(--cor) 55%, transparent) 38%,
-    color-mix(in oklab, var(--cor) 18%, transparent) 66%,
-    transparent 100%
-  );
-  will-change: transform, opacity;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-  /* Negativo e igual para todas: cada uma cai num ponto diferente do seu
-     ciclo porque as durações são diferentes. */
-  animation-delay: var(--aurora-t, 0s);
-}
-
-.bolha-1 {
-  --cor: var(--auroraA);
-  width: 62vmax;
-  left: -18%;
-  top: -34%;
-  animation-name: aurora-1;
-  animation-duration: 34s;
-}
-.bolha-2 {
-  --cor: var(--auroraB);
-  width: 56vmax;
-  right: -22%;
-  top: -12%;
-  animation-name: aurora-2;
-  animation-duration: 41s;
-}
-.bolha-3 {
-  --cor: var(--auroraC);
-  width: 64vmax;
-  left: 18%;
-  bottom: -48%;
-  animation-name: aurora-3;
-  animation-duration: 47s;
-}
-.bolha-4 {
-  --cor: var(--auroraD);
-  width: 40vmax;
-  left: 38%;
-  top: 18%;
-  animation-name: aurora-4;
-  animation-duration: 29s;
-}
-.bolha-5 {
-  --cor: var(--auroraE);
-  width: 34vmax;
-  left: -8%;
-  bottom: -14%;
-  animation-name: aurora-5;
-  animation-duration: 53s;
-}
-
-@keyframes aurora-1 {
-  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.9; }
-  50% { transform: translate3d(16vmax, 10vmax, 0) rotate(38deg) scale(1.16); opacity: 1; }
-  100% { transform: translate3d(6vmax, 22vmax, 0) rotate(-18deg) scale(0.94); opacity: 0.8; }
-}
-@keyframes aurora-2 {
-  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1.05); opacity: 1; }
-  50% { transform: translate3d(-18vmax, 14vmax, 0) rotate(-30deg) scale(0.9); opacity: 0.75; }
-  100% { transform: translate3d(-8vmax, 30vmax, 0) rotate(24deg) scale(1.12); opacity: 0.95; }
-}
-@keyframes aurora-3 {
-  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.85; }
-  50% { transform: translate3d(14vmax, -16vmax, 0) rotate(26deg) scale(1.12); opacity: 1; }
-  100% { transform: translate3d(-16vmax, -8vmax, 0) rotate(-34deg) scale(0.96); opacity: 0.9; }
-}
-@keyframes aurora-4 {
-  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9); opacity: 0.6; }
-  50% { transform: translate3d(-20vmax, 12vmax, 0) rotate(60deg) scale(1.2); opacity: 0.95; }
-  100% { transform: translate3d(12vmax, -10vmax, 0) rotate(120deg) scale(1); opacity: 0.7; }
-}
-@keyframes aurora-5 {
-  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.7; }
-  50% { transform: translate3d(30vmax, -6vmax, 0) rotate(-40deg) scale(1.25); opacity: 1; }
-  100% { transform: translate3d(54vmax, 6vmax, 0) rotate(10deg) scale(0.9); opacity: 0.75; }
-}
-
-/* Grão fino por cima: quebra o degradê em faixas e dá textura de papel. */
-.aurora-grao {
-  position: absolute;
-  inset: 0;
-  opacity: 0.07;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-}
-
-/* Movimento desligado: as manchas ficam paradas, mas continuam coloridas. */
-@media (prefers-reduced-motion: reduce) {
-  .aurora-bolha {
-    animation: none;
-  }
-}
-.sem-animacoes .aurora-bolha {
-  animation: none;
+/* Tudo que vem por cima do fundo. */
+.corpo > .barra-lateral,
+.corpo > .visualizacao {
+  position: relative;
+  z-index: 1;
 }

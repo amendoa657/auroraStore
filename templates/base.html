@@ -35,17 +35,13 @@
 {% if paleta %}<style>{{ paleta | safe }}</style>{% endif %}
 
 {#
-  Roda antes da primeira pintura:
-    - a fase da aurora vem do relógio, então trocar de página ou recarregar
-      continua o movimento das luzes de onde ele estava;
-    - abrir de novo a mesma página (a fila se recarrega sozinha a cada 2 s)
-      não repete as entradas animadas nem a transição entre páginas.
+  Roda antes da primeira pintura: abrir de novo a mesma página (a fila se
+  recarrega sozinha a cada 2 s) não repete as entradas animadas nem a
+  transição entre páginas.
 #}
 <script>
   (function () {
     var raiz = document.documentElement;
-    raiz.style.setProperty("--aurora-t", -((Date.now() / 1000) % 100000).toFixed(2) + "s");
-
     var aqui = location.pathname + location.search;
     var repeticao = false;
     try {
@@ -65,18 +61,6 @@
 <body>
 
 <div class="janela">
-
-  {# Fundo vivo. Fica atrás de tudo e nunca recebe clique. #}
-  <div class="aurora" aria-hidden="true">
-    <div class="aurora-campo">
-      <i class="aurora-bolha bolha-1"></i>
-      <i class="aurora-bolha bolha-2"></i>
-      <i class="aurora-bolha bolha-3"></i>
-      <i class="aurora-bolha bolha-4"></i>
-      <i class="aurora-bolha bolha-5"></i>
-    </div>
-    <div class="aurora-grao"></div>
-  </div>
 
   {#
     Cabeçalho. A tela pode trocar o miolo inteiro sobrescrevendo o bloco —
@@ -100,6 +84,9 @@
 
   <div class="corpo {% block classe_corpo %}{% endblock %}">
 
+    {# Fundo de pontos (luzes.js). Fica atrás de tudo e nunca recebe clique. #}
+    <div class="fundo" aria-hidden="true"><canvas class="fundo-pontos"></canvas></div>
+
     {% block lateral %}
       <nav class="barra-lateral" aria-label="Navegação principal">
         {% set menu = [
@@ -116,8 +103,8 @@
              {{ 'aria-current=page' if pagina == item.id }}>
             {# A pílula desliza de um item para o outro entre páginas. #}
             {% if pagina == item.id %}<i class="pilula" aria-hidden="true"></i>{% endif %}
-            <i class="ponto" aria-hidden="true"></i>
-            <span class="texto">{{ item.rotulo }}</span>
+            <i class="ponto" aria-hidden="true" style="view-transition-name: ponto-{{ item.id }}"></i>
+            <span class="texto" style="view-transition-name: rotulo-{{ item.id }}">{{ item.rotulo }}</span>
             {% if item.contagem %}<span class="contagem">{{ item.contagem }}</span>{% endif %}
             {% if item.selo %}<span class="selo-contagem">{{ item.selo }}</span>{% endif %}
           </a>

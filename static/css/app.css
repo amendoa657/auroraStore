@@ -109,20 +109,10 @@ mark {
   min-height: 47px;
   padding: 0 12px 0 16px;
   background: var(--superficieCabecalho);
-  -webkit-backdrop-filter: blur(18px) saturate(1.5);
-  backdrop-filter: blur(18px) saturate(1.5);
+  border-bottom: 1px solid var(--corSeparador);
   color: var(--corTextoBarraCabecalho);
   position: relative;
   z-index: 30;
-}
-/* Fio de luz na base do cabeçalho, nas três cores do tema. */
-.barra-cabecalho::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 1px;
-  background: var(--gradienteFio);
-  pointer-events: none;
 }
 .marca {
   display: flex;
@@ -137,15 +127,23 @@ mark {
 .marca:hover {
   color: inherit;
 }
+/* A marca são quatro pacotes empilhados, um em cada cor do tema. No hover
+   o bloco gira um quarto de volta e as cores trocam de lugar. */
+.marca-glifo,
+.glifo-grande {
+  --bloco: 44%;
+  background:
+    linear-gradient(var(--corDestaque) 0 0) 0 0 / var(--bloco) var(--bloco),
+    linear-gradient(var(--corAcentoSecundario) 0 0) 100% 0 / var(--bloco) var(--bloco),
+    linear-gradient(var(--corAcentoTerciario) 0 0) 0 100% / var(--bloco) var(--bloco),
+    linear-gradient(var(--corTextoJanela) 0 0) 100% 100% / var(--bloco) var(--bloco);
+  background-repeat: no-repeat;
+  transition: transform 0.36s var(--ease-out);
+}
 .marca-glifo {
   width: 15px;
   height: 15px;
-  border-radius: 4px;
-  background: var(--gradienteMarca);
-  box-shadow: 0 0 14px -2px color-mix(in oklab, var(--corDestaque) 70%, transparent);
-  transition:
-    transform var(--dur-media) var(--ease-out),
-    border-radius var(--dur-media) var(--ease-out);
+  border-radius: 2px;
 }
 .letraLogo {
   position: absolute;
@@ -154,8 +152,7 @@ mark {
   color: var(--corFundoJanela);
 }
 .marca:hover .marca-glifo {
-  transform: rotate(45deg) scale(1.08);
-  border-radius: 6px;
+  transform: rotate(90deg);
 }
 .meta-cabecalho {
   white-space: nowrap;
@@ -253,7 +250,6 @@ mark {
   border: 1.5px solid var(--corBordaVidro);
   border-radius: 8px;
   color: var(--corTextoTerciario);
-  view-transition-name: campo-busca;
   transition:
     border-color var(--dur-curta) ease,
     box-shadow var(--dur-curta) ease;
@@ -338,22 +334,23 @@ mark {
   background: var(--corFundoSecundarioSuave);
   color: var(--corTextoBarraLateral);
 }
-/* O item ativo tem nome próprio na view transition: ao trocar de página ele
-   desliza do item antigo para o novo, levando o rótulo junto. */
+/* O fundo do item ativo tem nome próprio na view transition: ao trocar de
+   página ele desliza do item antigo para o novo. Os rótulos e pontos de
+   cada item também têm nome (base.html), então ficam por cima da pílula e
+   só trocam de cor no lugar enquanto ela passa por baixo. */
 .item-lateral.ativo,
 .item-lateral.ativo:hover {
   background: transparent;
   color: var(--corTextoDestaque);
   font-weight: 600;
-  view-transition-name: pilula-lateral;
 }
 .pilula {
   position: absolute;
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background: var(--gradienteMarca);
-  box-shadow: var(--brilhoPrimario);
+  background: var(--corFundoDestaque);
+  view-transition-name: pilula-lateral;
 }
 .item-lateral .ponto {
   width: 7px;
@@ -514,7 +511,6 @@ mark {
   height: 6px;
   border-radius: 50%;
   background: var(--corDestaque);
-  box-shadow: 0 0 8px var(--corDestaque);
   flex: none;
   animation: respirar 2.6s ease-in-out infinite;
 }
@@ -570,31 +566,42 @@ mark {
   font-family: var(--fonteUi);
   font-weight: 600;
   font-size: 12px;
-  background: var(--superficieElevada);
+  /* Botões são teclas: cor chapada e uma borda de baixo mais escura que
+     some quando a tecla desce. --tecla é a cor da face. */
+  --tecla: var(--superficieElevada);
+  background: var(--tecla);
   color: var(--corTextoPopUp);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--corTextoJanela) 7%, transparent),
+    0 2px 0 color-mix(in oklab, var(--tecla) 45%, black);
   cursor: pointer;
   white-space: nowrap;
   flex: none;
   transition:
     background var(--dur-curta) ease,
     color var(--dur-curta) ease,
-    box-shadow var(--dur-curta) ease,
-    filter var(--dur-curta) ease,
-    transform var(--dur-toque) var(--ease-out),
+    box-shadow 90ms ease-out,
+    transform 90ms ease-out,
     opacity var(--dur-curta) ease;
 }
 .btn:hover {
-  background: var(--superficieElevadaHover);
+  background: color-mix(in oklab, var(--tecla) 88%, var(--corTextoJanela));
 }
 .btn:active {
-  transform: scale(0.97);
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--corTextoJanela) 4%, transparent),
+    0 0 0 color-mix(in oklab, var(--tecla) 45%, black);
 }
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 .btn:disabled:hover {
-  background: var(--superficieElevada);
+  background: var(--tecla);
+}
+.btn:disabled:active {
+  transform: none;
 }
 .btn-g {
   height: 37px;
@@ -603,45 +610,18 @@ mark {
   border-radius: var(--raio-m);
 }
 .btn-primario {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  background: var(--gradienteMarca);
+  --tecla: var(--corFundoDestaque);
   color: var(--corTextoDestaque);
-  box-shadow: var(--brilhoPrimario);
 }
 .btn-primario:hover {
-  background: var(--gradienteMarca);
-  box-shadow: var(--brilhoPrimarioForte);
-  filter: brightness(1.06) saturate(1.1);
-}
-/* Reflexo que atravessa o botão principal quando o cursor chega. */
-.btn-primario::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    color-mix(in oklab, white 34%, transparent) 50%,
-    transparent 70%
-  );
-  transform: translateX(-110%);
-  pointer-events: none;
-}
-@media (hover: hover) and (pointer: fine) {
-  .btn-primario:hover::after {
-    transform: translateX(110%);
-    transition: transform 0.7s var(--ease-out);
-  }
+  background: color-mix(in oklab, var(--tecla) 90%, white);
 }
 .btn-sucesso {
-  background: var(--corFundoSucesso);
+  --tecla: var(--corFundoSucesso);
   color: var(--corTextoSucesso);
 }
 .btn-destrutivo {
-  background: var(--corFundoDestrutivoSuave);
+  --tecla: color-mix(in oklab, var(--corFundoDestrutivo) 70%, var(--superficieBase));
   color: var(--corDestrutiva);
 }
 .btn-destrutivo:hover {
@@ -652,7 +632,8 @@ mark {
   );
 }
 .btn-contorno {
-  background: transparent;
+  --tecla: transparent;
+  box-shadow: none;
   border: 1px solid color-mix(in srgb, var(--corDestrutiva) 40%, transparent);
   color: var(--corTextoDestrutivo);
 }
@@ -682,6 +663,7 @@ mark {
   min-width: 118px;
 }
 .btn-ocupado {
+  box-shadow: none;
   background: linear-gradient(
     90deg,
     var(--corFundoDestaqueSuave) var(--progresso, 0%),
@@ -765,60 +747,15 @@ mark {
   gap: 11px;
 }
 
-/* Holofote: um brilho na cor do pacote que segue o cursor dentro do cartão
-   (a posição vem do luzes.js). Só aparece com mouse. */
-@property --holofote-x {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: -999px;
-}
-@property --holofote-y {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: -999px;
-}
-.cartao-app,
-.destaque,
-.cartao-categoria,
-.item-fila {
-  position: relative;
-  isolation: isolate;
-}
-.cartao-app::before,
-.destaque::before,
-.cartao-categoria::before,
-.item-fila::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: radial-gradient(
-    220px circle at var(--holofote-x) var(--holofote-y),
-    color-mix(in oklab, var(--tom, var(--corDestaque)) 18%, transparent),
-    transparent 70%
-  );
-  opacity: 0;
-  transition: opacity var(--dur-media) ease;
-  pointer-events: none;
-}
-@media (hover: hover) and (pointer: fine) {
-  .cartao-app:hover::before,
-  .destaque:hover::before,
-  .cartao-categoria:hover::before,
-  .item-fila:hover::before {
-    opacity: 1;
-  }
-}
-/* O cartão herda o tom do próprio ícone para o holofote e a borda. */
+/* O cartão herda o tom do próprio ícone para a borda do hover. */
 .cartao-app:has(.tom-0),
-.item-fila:has(.tom-0) { --tom: var(--vivoPrimario); }
+.item-fila:has(.tom-0) { --tom: var(--corDestaque); }
 .cartao-app:has(.tom-1),
-.item-fila:has(.tom-1) { --tom: var(--vivoSecundario); }
+.item-fila:has(.tom-1) { --tom: var(--corAcentoSecundario); }
 .cartao-app:has(.tom-2),
-.item-fila:has(.tom-2) { --tom: var(--vivoTerciario); }
+.item-fila:has(.tom-2) { --tom: var(--corAcentoTerciario); }
 .cartao-app:has(.tom-3),
-.item-fila:has(.tom-3) { --tom: color-mix(in oklab, var(--vivoSecundario), var(--vivoTerciario)); }
+.item-fila:has(.tom-3) { --tom: color-mix(in oklab, var(--corAcentoSecundario), var(--corAcentoTerciario)); }
 .cartao-app h3 {
   margin: 0;
   font-size: 13.5px;
@@ -901,33 +838,19 @@ a.cartao:hover,
   color: var(--corDestaque);
 }
 
-/* Ícones: monograma sobre um degradê no tom do pacote (tom-0…3 vem do macro
-   `icone`), com ângulo estável por pacote. */
+/* Ícones: a inicial em mono sobre um bloco de cor chapada no tom do pacote
+   (tom-0…3 vem do macro `icone`). */
 .icone-app {
-  --tom-icone: var(--tom, var(--vivoTerciario));
+  --tom-icone: var(--tom, var(--corAcentoTerciario));
   border-radius: 11px;
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    radial-gradient(
-      circle at 28% 18%,
-      color-mix(in oklab, var(--tom-icone) 46%, transparent),
-      transparent 64%
-    ),
-    linear-gradient(
-      var(--angulo, 135deg),
-      color-mix(in oklab, var(--tom-icone) 40%, var(--corFundoCartao)),
-      color-mix(in oklab, var(--tom-icone) 12%, var(--corFundoCartao))
-    );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklab, var(--tom-icone) 30%, transparent),
-    inset 0 1px 0 color-mix(in oklab, white 12%, transparent);
-  font-family: var(--fonteUi);
+  background: var(--tom-icone);
+  font-family: var(--fonteMono);
   font-weight: 700;
-  color: var(--tom-icone);
-  text-shadow: 0 0 18px color-mix(in oklab, var(--tom-icone) 60%, transparent);
+  color: color-mix(in oklab, var(--tom-icone) 22%, black);
   font-size: 15px;
   letter-spacing: -0.02em;
   user-select: none;
@@ -994,74 +917,43 @@ a.cartao:hover,
 .destaque-carrossel {
   position: relative;
 }
-/* O cartão grande da home. É visto uma vez por abertura, então pode ter um
-   pouco mais de vida: a borda é um anel de luz que gira devagar. */
-@property --giro {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
+/* O cartão grande da home: chapado no container secundário, com uma
+   retícula de pontos (a mesma do fundo) entrando pela direita. */
 .destaque {
-  --tom: var(--corDestaque);
+  --tom: var(--corAcentoSecundario);
   display: flex;
   gap: 20px;
   padding: 22px;
   border-radius: 14px;
   background:
-    radial-gradient(
-      90% 140% at 0% 0%,
-      color-mix(in oklab, var(--corDestaque) 16%, transparent),
-      transparent 60%
-    ),
-    linear-gradient(
-      120deg,
-      var(--superficieCartao) 0%,
-      var(--corFundoSecundarioSuave) 62%,
-      var(--corFundoTerciarioSuave) 100%
-    );
-  border: 1px solid transparent;
-  box-shadow:
-    0 18px 50px -18px var(--corSombraColorida),
-    0 0 0 1px var(--corBordaVidro);
+    conic-gradient(at 3px 3px, transparent 75%, color-mix(in oklab, var(--vivoSecundario) 55%, transparent) 0)
+      0 0 / 9px 9px,
+    color-mix(in oklab, var(--corFundoAcentoSecundario) 46%, var(--superficieCartao));
+  border: 1px solid color-mix(in oklab, var(--corAcentoSecundario) 26%, transparent);
+  box-shadow: var(--sombraCartao);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
 }
-.destaque::after {
+/* A retícula só aparece na ponta direita: uma camada da cor do cartão
+   cobre o resto e vai abrindo. */
+.destaque::before {
   content: "";
   position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(
-    from var(--giro),
-    transparent 0deg,
-    var(--corDestaque) 50deg,
-    var(--corAcentoTerciario) 110deg,
-    transparent 160deg,
-    transparent 200deg,
-    var(--corAcentoSecundario) 260deg,
-    transparent 320deg
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--corFundoAcentoSecundario) 46%, var(--superficieCartao)) 45%,
+    transparent 100%
   );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box exclude,
-    linear-gradient(#000 0 0);
-  animation: girar-borda 9s linear infinite;
   pointer-events: none;
-}
-@keyframes girar-borda {
-  to {
-    --giro: 360deg;
-  }
-}
-.destaque .icone-app {
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklab, var(--tom-icone) 36%, transparent),
-    0 14px 36px -10px color-mix(in oklab, var(--tom-icone) 60%, transparent);
 }
 .destaque.deslizando-direita {
   animation: deslizar var(--dur-media) var(--ease-out);
+}
+.destaque .icone-app {
+  box-shadow: 0 4px 0 color-mix(in oklab, var(--tom-icone) 40%, black);
 }
 .destaque-texto {
   display: flex;
@@ -1075,12 +967,7 @@ a.cartao:hover,
   font-weight: 600;
   font-size: 10px;
   letter-spacing: 0.16em;
-  color: var(--corDestaque);
-  background: var(--gradienteMarca);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  width: fit-content;
+  color: var(--corAcentoSecundario);
 }
 .destaque h1 {
   margin: 0;
@@ -1142,11 +1029,7 @@ a.cartao:hover,
   flex-wrap: wrap;
   padding: 14px 18px;
   border-radius: var(--raio-g);
-  background: linear-gradient(
-    100deg,
-    var(--corFundoDestaqueSuave),
-    var(--corFundoTerciarioSuave)
-  );
+  background: color-mix(in oklab, var(--corFundoDestaqueSuave), var(--superficieCartao));
   border: 1px solid color-mix(in oklab, var(--corDestaque) 28%, transparent);
 }
 .faixa-texto {
@@ -1224,8 +1107,7 @@ a.cartao:hover,
   top: 0;
   z-index: 4;
   background: var(--superficieFixa);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid var(--corSeparador);
 }
 .marca-busca {
   display: flex;
@@ -1234,10 +1116,7 @@ a.cartao:hover,
   gap: 8px;
   text-align: center;
   overflow: hidden;
-  /* Folga para o halo do glifo não ser cortado pelo overflow. */
-  padding: 22px 22px 0;
-  margin-top: -22px;
-  max-height: 222px;
+  max-height: 200px;
   opacity: 1;
 }
 .busca-central.compacta .marca-busca,
@@ -1248,58 +1127,19 @@ a.cartao:hover,
   padding: 0;
   pointer-events: none;
 }
-/* O glifo da busca é um orbe: degradê da marca com um halo que respira. */
 .glifo-grande {
-  position: relative;
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: var(--gradienteMarca);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, white 14%, transparent) inset,
-    0 16px 40px -10px color-mix(in oklab, var(--corDestaque) 70%, transparent);
-  transition: transform 0.5s var(--ease-out);
+  --bloco: 45%;
+  width: 46px;
+  height: 46px;
 }
-.glifo-grande::before {
-  content: "";
-  position: absolute;
-  inset: -18px;
-  z-index: -1;
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    color-mix(in oklab, var(--corLuzQuente) 55%, transparent),
-    transparent
-  );
-  animation: halo 4.8s ease-in-out infinite;
-}
-@keyframes halo {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(0.9);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.12);
-  }
-}
-.busca-central:hover .glifo-grande {
-  transform: rotate(45deg) scale(1.06);
+.marca-busca:hover .glifo-grande {
+  transform: rotate(90deg);
 }
 .marca-busca h1 {
   margin: 0;
   font-size: 27px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  background: linear-gradient(
-    100deg,
-    var(--corTextoJanela) 30%,
-    color-mix(in oklab, var(--corDestaque) 70%, var(--corTextoJanela)) 70%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 .marca-busca p {
   margin: 0;
@@ -1319,8 +1159,7 @@ a.cartao:hover,
   border: 1.5px solid var(--corBordaVidro);
   border-radius: 26px;
   color: var(--corTextoTerciario);
-  box-shadow: 0 10px 34px -10px color-mix(in oklab, var(--corFundoJanela) 90%, transparent);
-  view-transition-name: campo-busca;
+  box-shadow: 0 3px 0 color-mix(in oklab, var(--corFundoJanela) 70%, transparent);
   transition:
     border-color var(--dur-curta) ease,
     box-shadow var(--dur-media) ease,
@@ -1333,8 +1172,8 @@ a.cartao:hover,
   border-color: var(--corDestaque);
   color: var(--corTextoJanela);
   box-shadow:
-    0 0 0 4px color-mix(in oklab, var(--corDestaque) 18%, transparent),
-    0 14px 44px -12px color-mix(in oklab, var(--corDestaque) 55%, transparent);
+    0 0 0 3px color-mix(in oklab, var(--corDestaque) 20%, transparent),
+    0 3px 0 color-mix(in oklab, var(--corFundoJanela) 70%, transparent);
 }
 .busca-central.compacta .campo-central-envolucro {
   height: 42px;
@@ -1437,13 +1276,7 @@ a.cartao:hover,
   gap: 8px;
   flex-wrap: wrap;
   padding: 11px 18px;
-  background: color-mix(
-    in oklab,
-    color-mix(in oklab, var(--superficieBase) 86%, var(--corFundoAcentoSecundario)) 97%,
-    transparent
-  );
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  backdrop-filter: blur(18px) saturate(1.4);
+  background: color-mix(in oklab, var(--superficieBase) 86%, var(--corFundoAcentoSecundario));
   border-block: 1px solid var(--corBordaVidro);
   position: sticky;
   top: 0;
@@ -1479,10 +1312,9 @@ a.cartao:hover,
   transform: scale(0.96);
 }
 .chip.ativo {
-  background: var(--gradienteMarca);
+  background: var(--corFundoDestaque);
   color: var(--corTextoDestaque);
   font-weight: 600;
-  box-shadow: var(--brilhoPrimario);
 }
 .chip-remover {
   display: inline-flex;
@@ -1541,8 +1373,6 @@ a.cartao:hover,
 .cabecalho-tabela {
   min-height: 30px;
   background: var(--superficieFixa);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  backdrop-filter: blur(18px) saturate(1.4);
   font-family: var(--fonteMono);
   font-weight: 600;
   font-size: 10px;
@@ -1554,12 +1384,7 @@ a.cartao:hover,
   transition: background var(--dur-curta) ease;
 }
 .linha-pacote:not(.cabecalho-tabela):hover {
-  background: linear-gradient(
-    90deg,
-    var(--corFundoDestaqueSuave),
-    var(--corFundoTerciarioSuave) 60%,
-    transparent
-  );
+  background: var(--corFundoTerciarioSuave);
 }
 .nome-pacote {
   display: flex;
@@ -1644,19 +1469,23 @@ a.cartao:hover,
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--vivoPrimario), var(--vivoTerciario), var(--vivoSecundario));
-  box-shadow: 0 0 12px color-mix(in oklab, var(--vivoPrimario) 60%, transparent);
+  background: var(--corDestaque);
 }
 .barra-progresso.alta {
   flex: none;
   height: 5px;
   border-radius: 3px;
 }
-/* Barra de instalação: o degradê corre por dentro enquanto trabalha. */
+/* Barra de instalação: listras diagonais andando enquanto trabalha. */
 .barra-progresso.alta > i {
-  background: var(--gradienteProgresso);
-  background-size: 300% 100%;
-  animation: correr 2.4s linear infinite;
+  background: repeating-linear-gradient(
+      -45deg,
+      transparent 0 5px,
+      color-mix(in oklab, var(--corTextoDestaque) 22%, transparent) 5px 10px
+    )
+    0 0 / 14.14px 100%,
+    var(--corDestaque);
+  animation: correr 0.6s linear infinite;
 }
 
 /* ---------- Barra de estado ---------- */
@@ -1667,8 +1496,6 @@ a.cartao:hover,
   min-height: 32px;
   padding: 0 18px;
   background: var(--superficieCabecalho);
-  -webkit-backdrop-filter: blur(18px) saturate(1.5);
-  backdrop-filter: blur(18px) saturate(1.5);
   border-top: 1px solid var(--corBordaVidro);
   position: relative;
   z-index: 1;
@@ -2086,7 +1913,7 @@ button.dep {
   display: flex;
   flex-direction: column;
   border-radius: var(--raio-g);
-  background: color-mix(in oklab, var(--superficieBase) 86%, transparent);
+  background: var(--superficieBase);
   border: 1px solid var(--corBordaVidro);
   box-shadow: var(--sombraCartao);
   overflow: hidden;
@@ -2255,9 +2082,7 @@ button.dep {
   background: var(--superficieElevada);
   color: var(--corTextoPopUp);
   border: 1px solid var(--corBordaVidro);
-  box-shadow:
-    0 16px 40px -8px rgba(0, 0, 0, 0.55),
-    0 0 0 1px color-mix(in oklab, var(--corDestaque) 10%, transparent);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.55);
   font-size: 12.5px;
   /* Entra rápido (240ms), fica, e sai mais rápido ainda. */
   animation: aparecer-sumir 4.5s linear forwards;
@@ -2266,13 +2091,11 @@ button.dep {
   0% {
     opacity: 0;
     transform: translateY(100%) scale(0.96);
-    filter: blur(4px);
     animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   }
   5.4% {
     opacity: 1;
     transform: none;
-    filter: none;
   }
   95.5% {
     opacity: 1;
@@ -2290,8 +2113,6 @@ button.dep {
   height: 6px;
   border-radius: 50%;
   background: var(--corDestaque);
-  box-shadow: 0 0 8px currentColor;
-  color: var(--corDestaque);
   flex: none;
 }
 .aviso-ok .marcador {
@@ -2321,9 +2142,7 @@ button.dep {
   animation: abrir-dialogo var(--dur-media) var(--ease-out);
 }
 .dialogo::backdrop {
-  background: color-mix(in oklab, var(--corFundoJanela) 62%, transparent);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  background: color-mix(in oklab, var(--corFundoJanela) 70%, transparent);
 }
 .dialogo[open]::backdrop {
   animation: entrar-fundo var(--dur-media) ease-out;
@@ -2499,8 +2318,7 @@ button.dep {
     background var(--dur-media) ease;
 }
 .interruptor-entrada:checked + i {
-  background: var(--gradienteMarca);
-  box-shadow: var(--brilhoPrimario);
+  background: var(--corFundoDestaque);
 }
 .interruptor-entrada:checked + i::after {
   transform: translateX(18px);
@@ -2587,18 +2405,15 @@ button.dep {
 }
 
 /* ---------- Animações ---------- */
-/* Entrada: sobe pouco e desfoca levemente — o blur junta o "antes" e o
-   "depois" num movimento só, em vez de um fade seco. */
+/* Entrada: sobe pouco e aparece. */
 @keyframes entrar {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.985);
-    filter: blur(3px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 }
 @keyframes entrar-fundo {
@@ -2679,7 +2494,7 @@ button.dep {
 }
 @keyframes correr {
   to {
-    background-position: -200% 0;
+    background-position: 14.14px 0, 0 0;
   }
 }
 
@@ -2737,8 +2552,7 @@ button.dep {
 /* ---------- Transição entre páginas ----------
    Cada clique no menu é uma página nova vinda do Flask. Com a View
    Transitions API o navegador faz a ponte: o conteúdo troca com um
-   cruzamento curto, a pílula do menu desliza até o item novo e o campo de
-   busca do cabeçalho voa até o centro da tela de busca (e volta).
+   cruzamento curto e a pílula do menu desliza até o item novo.
    Navegador sem suporte simplesmente troca de página como antes. */
 @media (prefers-reduced-motion: no-preference) {
   @view-transition {
@@ -2754,11 +2568,6 @@ button.dep {
 }
 ::view-transition-new(root) {
   animation: 260ms cubic-bezier(0.23, 1, 0.32, 1) both vt-entrar;
-}
-::view-transition-old(campo-busca),
-::view-transition-new(campo-busca) {
-  height: 100%;
-  animation-duration: 260ms;
 }
 @keyframes vt-sair {
   to {
@@ -2789,20 +2598,14 @@ button.dep {
   .dialogo[open] {
     animation: so-aparecer 0.2s ease backwards;
   }
-  .destaque::after,
-  .glifo-grande::before,
   .barra-progresso.alta > i,
   .pulso {
     animation: none;
-  }
-  .btn-primario::after {
-    display: none;
   }
   a.cartao:hover,
   .cartao-app:hover,
   .cartao-categoria:hover,
   .cartao-indice:hover,
-  .btn:active,
   .chip:active {
     transform: none;
   }
