@@ -1,0 +1,180 @@
+/* Camada viva da paleta.
+
+   Carregada DEPOIS do /tema.css (o arquivo gerado pelo Matugen), então tudo
+   aqui é recalculado a partir das cores do wallpaper — nenhuma cor fixa.
+   Os nomes base (--corDestaque, --corFundoCartao, …) continuam vindo do
+   Matugen; este arquivo só cria derivadas e mistura os acentos nas
+   superfícies para a interface não ficar cinza.
+
+   As misturas usam oklab: a cor resultante mantém a saturação em vez de
+   lavar para o cinza como acontece no srgb. */
+
+:root {
+  /* ---------- Texto ---------- */
+  --corTextoSecundario: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--corTextoJanela) 86%, var(--corAcentoTerciario)) 80%,
+    transparent
+  );
+  --corTextoTerciario: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--corTextoJanela) 80%, var(--corAcentoTerciario)) 64%,
+    transparent
+  );
+  --corSeparador: color-mix(in oklab, var(--corAcentoTerciario) 12%, transparent);
+  --corDecorativa: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--corTextoJanela) 60%, var(--corAcentoTerciario)) 30%,
+    transparent
+  );
+  --corFocoContorno: var(--corDestaque);
+
+  /* ---------- Bordas ---------- */
+  --corBordaDestaque: color-mix(in oklab, var(--corDestaque) 48%, transparent);
+  --corBordaSecundaria: color-mix(in oklab, var(--corAcentoSecundario) 40%, transparent);
+  --corBordaTerciaria: color-mix(in oklab, var(--corAcentoTerciario) 22%, transparent);
+  --corBordaVidro: color-mix(in oklab, var(--corTextoJanela) 9%, transparent);
+
+  /* ---------- Fundos suaves dos acentos ---------- */
+  --corFundoDestaqueSuave: color-mix(in oklab, var(--corDestaque) 18%, transparent);
+  --corFundoSecundarioSuave: color-mix(in oklab, var(--corAcentoSecundario) 18%, transparent);
+  --corFundoTerciarioSuave: color-mix(in oklab, var(--corAcentoTerciario) 18%, transparent);
+  --corFundoDestrutivoSuave: color-mix(in oklab, var(--corFundoDestrutivo) 46%, transparent);
+  --corLuzMista: color-mix(in oklab, var(--corAcentoSecundario) 50%, var(--corAcentoTerciario));
+  --corLuzQuente: color-mix(in oklab, var(--corDestaque) 55%, var(--corAcentoSecundario));
+  --corBrilhoFundoPrimario: color-mix(in oklab, var(--corDestaque) 20%, transparent);
+  --corBrilhoFundoSecundario: color-mix(in oklab, var(--corAcentoSecundario) 24%, transparent);
+  --corBrilhoFundoTerciario: color-mix(in oklab, var(--corAcentoTerciario) 22%, transparent);
+  --corSombraColorida: color-mix(in oklab, var(--corAcentoTerciario) 30%, transparent);
+
+  /* ---------- Superfícies tingidas ----------
+     Os "containers" do Material You são escuros e saturados: misturados nas
+     superfícies neutras dão cor sem clarear demais. As translúcidas deixam a
+     aurora do fundo aparecer por trás. */
+  --superficieBase: color-mix(
+    in oklab,
+    var(--corFundoVisualizacao) 80%,
+    var(--corFundoAcentoTerciario)
+  );
+  --superficieJanela: color-mix(
+    in oklab,
+    var(--corFundoJanela) 82%,
+    var(--corFundoAcentoTerciario)
+  );
+  --superficieCabecalho: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--corFundoBarraCabecalho) 80%, var(--corFundoAcentoTerciario)) 72%,
+    transparent
+  );
+  --superficieLateral: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--corFundoBarraLateral) 78%, var(--corFundoAcentoSecundario)) 50%,
+    transparent
+  );
+  --superficieLateralSecundaria: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--corFundoBarraLateralSecundaria) 76%, var(--corFundoAcentoTerciario)) 70%,
+    transparent
+  );
+  --superficieCartao: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--corFundoCartao) 84%, var(--corFundoAcentoTerciario)) 70%,
+    transparent
+  );
+  --superficieCartaoHover: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--corFundoCartao) 72%, var(--corFundoAcentoSecundario)) 84%,
+    transparent
+  );
+  --superficieElevada: color-mix(
+    in oklab,
+    var(--corFundoPopUp) 80%,
+    var(--corFundoAcentoTerciario)
+  );
+  --superficieElevadaHover: color-mix(
+    in oklab,
+    var(--corFundoPopUp) 66%,
+    var(--corFundoAcentoSecundario)
+  );
+  --superficieLeitura: color-mix(in oklab, var(--superficieBase) 78%, transparent);
+  /* Barras que grudam no topo: quase opacas, a lista rola por baixo sem
+     aparecer através delas. */
+  --superficieFixa: color-mix(in oklab, var(--superficieBase) 97%, transparent);
+  --corFundoCartaoHover: var(--superficieCartaoHover);
+
+  /* Ícones de pacote sem imagem: trama tingida em vez de cinza. */
+  --corPlaceholderA: color-mix(in oklab, var(--corAcentoTerciario) 16%, var(--corFundoCartao));
+  --corPlaceholderB: color-mix(in oklab, var(--corAcentoTerciario) 7%, var(--corFundoCartao));
+
+  /* ---------- Gradientes de marca ---------- */
+  --gradienteMarca: linear-gradient(
+    135deg,
+    var(--vivoPrimario) 0%,
+    color-mix(in oklab, var(--vivoPrimario) 45%, var(--vivoTerciario)) 52%,
+    var(--vivoSecundario) 100%
+  );
+  --gradienteFio: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--vivoPrimario) 75%, transparent) 18%,
+    color-mix(in oklab, var(--vivoTerciario) 75%, transparent) 50%,
+    color-mix(in oklab, var(--vivoSecundario) 75%, transparent) 82%,
+    transparent 100%
+  );
+  --gradienteProgresso: linear-gradient(
+    90deg,
+    var(--vivoPrimario),
+    var(--vivoTerciario),
+    var(--vivoSecundario),
+    var(--vivoPrimario)
+  );
+
+  /* ---------- Brilhos ---------- */
+  --brilhoPrimario: 0 6px 22px -6px color-mix(in oklab, var(--vivoPrimario) 70%, transparent);
+  --brilhoPrimarioForte: 0 10px 30px -6px color-mix(in oklab, var(--vivoPrimario) 85%, transparent);
+  --sombraCartao: 0 1px 0 color-mix(in oklab, var(--corTextoJanela) 6%, transparent) inset,
+    0 12px 32px -14px color-mix(in oklab, var(--corFundoJanela) 80%, transparent);
+  --sombraCartaoHover: 0 1px 0 color-mix(in oklab, var(--corTextoJanela) 10%, transparent) inset,
+    0 18px 40px -16px var(--corSombraColorida);
+
+  /* ---------- Aurora (fundo) ---------- */
+  --auroraA: color-mix(in oklab, var(--vivoPrimario) 52%, transparent);
+  --auroraB: color-mix(in oklab, var(--vivoSecundario) 50%, transparent);
+  --auroraC: color-mix(in oklab, var(--vivoTerciario) 50%, transparent);
+  --auroraD: color-mix(in oklab, color-mix(in oklab, var(--vivoSecundario), var(--vivoTerciario)) 42%, transparent);
+  --auroraE: color-mix(in oklab, color-mix(in oklab, var(--vivoPrimario), var(--vivoSecundario)) 36%, transparent);
+
+  /* ---------- Movimento ----------
+     Curvas fortes: ease-out para entrar/sair, ease-in-out para mover. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-toque: 140ms;
+  --dur-curta: 180ms;
+  --dur-media: 240ms;
+}
+
+/* Versões saturadas dos acentos.
+   No esquema escuro o Material You entrega acentos pastel (pouca croma):
+   bonitos em texto, mas lavados quando viram luz de fundo. Aqui o matiz
+   continua o do wallpaper; só a croma sobe e a luminosidade fica numa
+   faixa que brilha sem estourar. Sem suporte a cor relativa, fica o pastel. */
+:root {
+  --vivoPrimario: var(--corDestaque);
+  --vivoSecundario: var(--corAcentoSecundario);
+  --vivoTerciario: var(--corAcentoTerciario);
+}
+@supports (color: oklch(from red l c h)) {
+  :root {
+    --vivoPrimario: oklch(from var(--corDestaque) clamp(0.66, l, 0.8) calc(c * 1.7 + 0.03) h);
+    --vivoSecundario: oklch(from var(--corAcentoSecundario) clamp(0.64, l, 0.78) calc(c * 1.8 + 0.03) h);
+    --vivoTerciario: oklch(from var(--corAcentoTerciario) clamp(0.64, l, 0.78) calc(c * 1.8 + 0.03) h);
+  }
+}
+
+/* Tons por pacote: o macro `icone` escolhe um a partir do nome, então cada
+   pacote mantém sempre a mesma cor. */
+.tom-0 { --tom: var(--vivoPrimario); }
+.tom-1 { --tom: var(--vivoSecundario); }
+.tom-2 { --tom: var(--vivoTerciario); }
+.tom-3 { --tom: color-mix(in oklab, var(--vivoSecundario), var(--vivoTerciario)); }

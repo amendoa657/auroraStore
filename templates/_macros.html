@@ -29,11 +29,15 @@
 {% endmacro %}
 
 
-{# Quadradinho no lugar do ícone do app: a inicial sobre a trama listrada.
+{# Quadradinho no lugar do ícone do app: a inicial sobre um degradê.
+   O tom (uma das quatro cores do tema) e o ângulo saem do nome, então o
+   mesmo pacote tem sempre a mesma cara em qualquer tela.
    Troque por <img src="..."> quando tiver ícones de verdade. #}
 {% macro icone(pacote, tamanho="icone-42") %}
-  <div class="icone-app {{ tamanho }}" aria-hidden="true">
-    {{ (pacote.titulo or pacote.nome)[0] | upper }}
+  {% set nome = (pacote.titulo or pacote.nome or "?") | lower %}
+  {% set semente = "abcdefghijklmnopqrstuvwxyz0123456789".find(nome[0]) + nome | length * 7 %}
+  <div class="icone-app {{ tamanho }} tom-{{ semente % 4 }}" style="--angulo: {{ (semente * 47) % 360 }}deg" aria-hidden="true">
+    {{ nome[0] | upper }}
   </div>
 {% endmacro %}
 

@@ -25,6 +25,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
 <link rel="stylesheet" href="/tema.css">
 {#<link rel="stylesheet" href="{{ url_for('static', filename='css/themeAlt.css') }}"> #}
+{# Derivadas vivas: vêm depois do Matugen para recalcular a partir das cores dele. #}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/paleta.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/luzes.css') }}">
 
@@ -32,11 +34,49 @@
    É CSS colado por quem usa o programa, então vai cru mesmo (| safe). #}
 {% if paleta %}<style>{{ paleta | safe }}</style>{% endif %}
 
+{#
+  Roda antes da primeira pintura:
+    - a fase da aurora vem do relógio, então trocar de página ou recarregar
+      continua o movimento das luzes de onde ele estava;
+    - abrir de novo a mesma página (a fila se recarrega sozinha a cada 2 s)
+      não repete as entradas animadas nem a transição entre páginas.
+#}
+<script>
+  (function () {
+    var raiz = document.documentElement;
+    raiz.style.setProperty("--aurora-t", -((Date.now() / 1000) % 100000).toFixed(2) + "s");
+
+    var aqui = location.pathname + location.search;
+    var repeticao = false;
+    try {
+      repeticao = sessionStorage.getItem("aurora:ultima") === aqui;
+      sessionStorage.setItem("aurora:ultima", aqui);
+    } catch (erro) {}
+    if (repeticao) raiz.classList.add("repeticao");
+
+    window.addEventListener("pagereveal", function (evento) {
+      if (repeticao && evento.viewTransition) evento.viewTransition.skipTransition();
+    });
+  })();
+</script>
+
 {% block cabeca %}{% endblock %}
 </head>
 <body>
 
 <div class="janela">
+
+  {# Fundo vivo. Fica atrás de tudo e nunca recebe clique. #}
+  <div class="aurora" aria-hidden="true">
+    <div class="aurora-campo">
+      <i class="aurora-bolha bolha-1"></i>
+      <i class="aurora-bolha bolha-2"></i>
+      <i class="aurora-bolha bolha-3"></i>
+      <i class="aurora-bolha bolha-4"></i>
+      <i class="aurora-bolha bolha-5"></i>
+    </div>
+    <div class="aurora-grao"></div>
+  </div>
 
   {#
     Cabeçalho. A tela pode trocar o miolo inteiro sobrescrevendo o bloco —
@@ -74,6 +114,8 @@
         {% for item in menu %}
           <a class="item-lateral {{ 'ativo' if pagina == item.id }}" href="{{ item.url }}"
              {{ 'aria-current=page' if pagina == item.id }}>
+            {# A pílula desliza de um item para o outro entre páginas. #}
+            {% if pagina == item.id %}<i class="pilula" aria-hidden="true"></i>{% endif %}
             <i class="ponto" aria-hidden="true"></i>
             <span class="texto">{{ item.rotulo }}</span>
             {% if item.contagem %}<span class="contagem">{{ item.contagem }}</span>{% endif %}
@@ -109,7 +151,7 @@
       </nav>
     {% endblock %}
 
-    <main class="visualizacao {% block classe_conteudo %}{% endblock %}" data-fundo-luzes>
+    <main class="visualizacao {% block classe_conteudo %}{% endblock %}">
       {% block conteudo %}{% endblock %}
     </main>
 

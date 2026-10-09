@@ -1,132 +1,94 @@
-/* Física leve para o campo líquido de luzes.
-   As manchas orbitam, se atraem quando se aproximam e uma quarta mancha
-   acompanha a mistura delas para criar a sensação de tinta luminosa. */
+/* Aurora: os detalhes que o CSS não faz sozinho.
+
+   1. O campo de luzes acompanha o ponteiro com uma mola: desliza poucos
+      pixels, com inércia, e o laço para assim que tudo assenta.
+   2. Os cartões ganham um holofote que segue o cursor.
+
+   As manchas em si se movem só pelo CSS (luzes.css). */
 (function () {
-  const area = document.querySelector("[data-fundo-luzes]");
-  if (!area) return;
-
+  const raiz = document.documentElement;
   const semMovimento =
-    document.documentElement.classList.contains("sem-animacoes") ||
+    raiz.classList.contains("sem-animacoes") ||
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ponteiroFino = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  const luzes = [
-    { x: 18, y: 20, vx: 0, vy: 0, ax: 18, ay: 12, velocidade: 0.72, fase: 0.4 },
-    { x: 82, y: 26, vx: 0, vy: 0, ax: 18, ay: 15, velocidade: 0.58, fase: 2.2 },
-    { x: 54, y: 78, vx: 0, vy: 0, ax: 20, ay: 15, velocidade: 0.46, fase: 4.5 },
-    { x: 50, y: 50, vx: 0, vy: 0, ax: 14, ay: 15, velocidade: 0.82, fase: 1.4 },
-  ];
+  if (semMovimento || !ponteiroFino) return;
 
-  const ponteiro = { x: 0.5, y: 0.5 };
-  let ultimoTempo = performance.now();
+  /* ---------- 1. Paralaxe com mola ---------- */
+  const campo = document.querySelector(".aurora-campo");
+  const ALCANCE = 26; // px que o campo anda até a borda da janela
+  const RIGIDEZ = 26;
+  const AMORTECIMENTO = 9;
 
-  function definirPosicao(indice, x, y) {
-    area.style.setProperty(`--luz-${indice + 1}-x`, `${x}%`);
-    area.style.setProperty(`--luz-${indice + 1}-y`, `${y}%`);
+  const estado = { x: 0, y: 0, vx: 0, vy: 0, alvoX: 0, alvoY: 0 };
+  let quadro = 0;
+  let ultimo = 0;
+
+  function passo(agora) {
+    /* Integração por tempo real: a mola se comporta igual a 60 ou 144 Hz. */
+    const dt = Math.min((agora - ultimo) / 1000, 1 / 30);
+    ultimo = agora;
+
+    const ax = (estado.alvoX - estado.x) * RIGIDEZ - estado.vx * AMORTECIMENTO;
+    const ay = (estado.alvoY - estado.y) * RIGIDEZ - estado.vy * AMORTECIMENTO;
+    estado.vx += ax * dt;
+    estado.vy += ay * dt;
+    estado.x += estado.vx * dt;
+    estado.y += estado.vy * dt;
+
+    campo.style.transform = `translate3d(${estado.x.toFixed(2)}px, ${estado.y.toFixed(2)}px, 0)`;
+
+    const parado =
+      Math.abs(estado.alvoX - estado.x) < 0.05 &&
+      Math.abs(estado.alvoY - estado.y) < 0.05 &&
+      Math.abs(estado.vx) < 0.05 &&
+      Math.abs(estado.vy) < 0.05;
+
+    quadro = parado ? 0 : requestAnimationFrame(passo);
   }
 
-  function limitar(valor, minimo, maximo) {
-    return Math.max(minimo, Math.min(maximo, valor));
+  function acordar() {
+    if (quadro) return;
+    ultimo = performance.now();
+    quadro = requestAnimationFrame(passo);
   }
 
-  /* Cada abertura recebe uma composição inicial própria. */
-  luzes.forEach((luz, indice) => {
-    const variacao = indice === 3 ? 6 : 10;
-    luz.x += (Math.random() - 0.5) * variacao;
-    luz.y += (Math.random() - 0.5) * variacao;
-    definirPosicao(indice, luz.x, luz.y);
-  });
+  if (campo) {
+    document.addEventListener(
+      "pointermove",
+      (evento) => {
+        estado.alvoX = (0.5 - evento.clientX / window.innerWidth) * ALCANCE * 2;
+        estado.alvoY = (0.5 - evento.clientY / window.innerHeight) * ALCANCE * 2;
+        acordar();
+      },
+      { passive: true },
+    );
 
-  if (semMovimento) return;
-
-  function atualizar(agora) {
-    const delta = Math.min((agora - ultimoTempo) / 1000, 0.034);
-    const tempo = agora / 1000;
-    ultimoTempo = agora;
-
-    const centroX = (ponteiro.x - 0.5) * 7;
-    const centroY = (ponteiro.y - 0.5) * 7;
-
-    /* As três cores principais fazem órbitas lentas e procuram seus alvos. */
-    for (let indice = 0; indice < 3; indice += 1) {
-      const luz = luzes[indice];
-      const alvoX =
-        luz.x +
-        Math.sin(tempo * luz.velocidade + luz.fase) * luz.ax +
-        centroX * (indice % 2 === 0 ? 1 : -1);
-      const alvoY =
-        luz.y +
-        Math.cos(tempo * luz.velocidade * 0.78 + luz.fase) * luz.ay +
-        centroY;
-
-      luz.vx += (alvoX - luz.x) * delta * 0.9;
-      luz.vy += (alvoY - luz.y) * delta * 0.9;
-      luz.vx *= 0.985;
-      luz.vy *= 0.985;
-      luz.x += luz.vx * delta * 7;
-      luz.y += luz.vy * delta * 7;
-    }
-
-    /* Quando duas manchas chegam perto, elas se atraem suavemente: as cores
-       se encontram no mesmo ponto e o blend-mode do CSS soma os pigmentos. */
-    for (let primeiro = 0; primeiro < 3; primeiro += 1) {
-      for (let segundo = primeiro + 1; segundo < 3; segundo += 1) {
-        const a = luzes[primeiro];
-        const b = luzes[segundo];
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const distancia = Math.hypot(dx, dy);
-
-        if (distancia > 1 && distancia < 62) {
-          const atracao = (62 - distancia) * delta * 0.009;
-          a.vx += dx * atracao;
-          a.vy += dy * atracao;
-          b.vx -= dx * atracao;
-          b.vy -= dy * atracao;
-        }
-      }
-    }
-
-    /* A quarta mancha é uma emulsão viva do centro das três outras. */
-    const misturaX = (luzes[0].x + luzes[1].x + luzes[2].x) / 3;
-    const misturaY = (luzes[0].y + luzes[1].y + luzes[2].y) / 3;
-    const hibrida = luzes[3];
-    const alvoHibridoX = misturaX + Math.sin(tempo * 0.9) * hibrida.ax;
-    const alvoHibridoY = misturaY + Math.cos(tempo * 0.72) * hibrida.ay;
-    hibrida.x += (alvoHibridoX - hibrida.x) * delta * 1.6;
-    hibrida.y += (alvoHibridoY - hibrida.y) * delta * 1.6;
-
-    luzes.forEach((luz, indice) => {
-      luz.x = limitar(luz.x, -8, 108);
-      luz.y = limitar(luz.y, -8, 108);
-      definirPosicao(indice, luz.x, luz.y);
+    /* Ponteiro saiu da janela: o campo volta devagar para o centro. */
+    document.documentElement.addEventListener("pointerleave", () => {
+      estado.alvoX = 0;
+      estado.alvoY = 0;
+      acordar();
     });
-
-    requestAnimationFrame(atualizar);
   }
 
-  requestAnimationFrame(atualizar);
+  /* ---------- 2. Holofote dos cartões ----------
+     A posição vai em propriedades registradas com inherits: false, então
+     mudar o valor não recalcula os filhos do cartão. */
+  const SELETOR_HOLOFOTE = ".cartao-app, .destaque, .cartao-categoria, .item-fila";
 
   document.addEventListener(
     "pointermove",
     (evento) => {
-      ponteiro.x = evento.clientX / window.innerWidth;
-      ponteiro.y = evento.clientY / window.innerHeight;
+      const alvo = evento.target.closest?.(SELETOR_HOLOFOTE);
+      if (!alvo) return;
+      /* A janela usa `zoom` (--escala-interface): a caixa vem na escala da
+         tela, o gradiente desenha na escala do cartão. */
+      const caixa = alvo.getBoundingClientRect();
+      const escala = caixa.width / alvo.offsetWidth || 1;
+      alvo.style.setProperty("--holofote-x", `${(evento.clientX - caixa.left) / escala}px`);
+      alvo.style.setProperty("--holofote-y", `${(evento.clientY - caixa.top) / escala}px`);
     },
     { passive: true },
   );
-
-  document.addEventListener("click", (evento) => {
-    area.style.setProperty("--pulso-x", `${evento.clientX}px`);
-    area.style.setProperty("--pulso-y", `${evento.clientY}px`);
-    area.style.setProperty(
-      "--pulso-cor",
-      evento.clientX < window.innerWidth / 2
-        ? "color-mix(in srgb, var(--corDestaque) 26%, transparent)"
-        : "color-mix(in srgb, var(--corAcentoSecundario) 26%, transparent)",
-    );
-    area.classList.remove("luzes-pulsando");
-    void area.offsetWidth;
-    area.classList.add("luzes-pulsando");
-    window.setTimeout(() => area.classList.remove("luzes-pulsando"), 900);
-  });
 })();

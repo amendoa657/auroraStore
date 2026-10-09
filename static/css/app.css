@@ -22,7 +22,7 @@ body {
   font-family: var(--fonteUi);
   font-size: 13px;
   line-height: 1.45;
-  background: var(--corFundoJanela);
+  background: var(--superficieJanela);
   color: var(--corTextoJanela);
   -webkit-font-smoothing: antialiased;
 }
@@ -85,14 +85,17 @@ mark {
   height: calc(100vh / var(--escala-interface));
   height: calc(100dvh / var(--escala-interface));
   min-height: calc(420px / var(--escala-interface));
-  background: var(--corFundoJanela);
+  background: var(--superficieJanela);
   overflow: hidden;
+  position: relative;
+  isolation: isolate;
 }
 .corpo {
   display: grid;
   grid-template-columns: 224px minmax(0, 1fr);
   min-height: 0;
   position: relative;
+  z-index: 1;
 }
 .corpo.sem-lateral {
   grid-template-columns: minmax(0, 1fr);
@@ -105,12 +108,21 @@ mark {
   gap: 16px;
   min-height: 47px;
   padding: 0 12px 0 16px;
-  background: var(--corFundoBarraCabecalho);
+  background: var(--superficieCabecalho);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
   color: var(--corTextoBarraCabecalho);
   position: relative;
   z-index: 30;
-  box-shadow: 0 1px 0 var(--corBordaDestaque);
-  border-bottom: 1px solid var(--corBordaSecundaria);
+}
+/* Fio de luz na base do cabeçalho, nas três cores do tema. */
+.barra-cabecalho::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: var(--gradienteFio);
+  pointer-events: none;
 }
 .marca {
   display: flex;
@@ -129,10 +141,11 @@ mark {
   width: 15px;
   height: 15px;
   border-radius: 4px;
-  background: var(--corDestaque);
+  background: var(--gradienteMarca);
+  box-shadow: 0 0 14px -2px color-mix(in oklab, var(--corDestaque) 70%, transparent);
   transition:
-    transform 0.28s cubic-bezier(0.2, 0.8, 0.3, 1),
-    border-radius 0.28s;
+    transform var(--dur-media) var(--ease-out),
+    border-radius var(--dur-media) var(--ease-out);
 }
 .letraLogo {
   position: absolute;
@@ -196,7 +209,7 @@ mark {
   color: var(--corTextoJanela);
 }
 .aba.ativa {
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoPopUp);
   font-weight: 600;
 }
@@ -222,7 +235,7 @@ mark {
   transition: transform 0.2s;
 }
 .alternar-lateral:hover {
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
 }
 
 /* ---------- Busca ---------- */
@@ -236,13 +249,14 @@ mark {
   flex: 1;
   max-width: 440px;
   min-width: 0;
-  background: var(--corFundoVisualizacao);
-  border: 1.5px solid transparent;
+  background: var(--superficieFixa);
+  border: 1.5px solid var(--corBordaVidro);
   border-radius: 8px;
   color: var(--corTextoTerciario);
+  view-transition-name: campo-busca;
   transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+    border-color var(--dur-curta) ease,
+    box-shadow var(--dur-curta) ease;
 }
 .busca-envolucro:focus-within {
   border-color: var(--corDestaque);
@@ -284,9 +298,10 @@ mark {
   font-size: 10.5px;
   padding: 1px 6px;
   border-radius: 4px;
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoTerciario);
   flex: none;
+  transition: opacity var(--dur-curta) ease;
 }
 .busca-envolucro:focus-within .atalho {
   opacity: 0;
@@ -298,15 +313,10 @@ mark {
   flex-direction: column;
   gap: 2px;
   padding: 12px 10px;
-  background:
-    radial-gradient(
-      circle at 0% 12%,
-      var(--corBrilhoFundoSecundario),
-      transparent 34%
-    ),
-    var(--corFundoBarraLateral);
+  background: var(--superficieLateral);
+  position: relative;
   color: var(--corTextoBarraLateral);
-  border-right: 1px solid var(--corBordaBarraLateral);
+  border-right: 1px solid var(--corBordaVidro);
   overflow-y: auto;
   min-height: 0;
 }
@@ -318,18 +328,32 @@ mark {
   border-radius: 8px;
   color: var(--corTextoSecundario);
   font-weight: 500;
+  position: relative;
+  isolation: isolate;
   transition:
-    background 0.16s,
-    color 0.16s;
+    background var(--dur-curta) ease,
+    color var(--dur-curta) ease;
 }
 .item-lateral:hover {
   background: var(--corFundoSecundarioSuave);
   color: var(--corTextoBarraLateral);
 }
-.item-lateral.ativo {
-  background: var(--corFundoDestaque);
+/* O item ativo tem nome próprio na view transition: ao trocar de página ele
+   desliza do item antigo para o novo, levando o rótulo junto. */
+.item-lateral.ativo,
+.item-lateral.ativo:hover {
+  background: transparent;
   color: var(--corTextoDestaque);
   font-weight: 600;
+  view-transition-name: pilula-lateral;
+}
+.pilula {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--gradienteMarca);
+  box-shadow: var(--brilhoPrimario);
 }
 .item-lateral .ponto {
   width: 7px;
@@ -408,22 +432,27 @@ mark {
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
-  background: var(--corFundoBarraLateralSecundaria);
+  background: var(--superficieLateralSecundaria);
   color: var(--corTextoBarraLateralSecundaria);
   font-family: var(--fonteMono);
   font-weight: 500;
   font-size: 12px;
   opacity: 0.55;
   transition:
-    opacity 0.18s,
-    background 0.18s;
+    opacity var(--dur-curta) ease,
+    background var(--dur-curta) ease,
+    transform var(--dur-toque) var(--ease-out);
 }
 .fonte-repo.ligada {
   opacity: 1;
   background: var(--corFundoSecundarioSuave);
+  box-shadow: inset 0 0 0 1px var(--corBordaSecundaria);
 }
 .fonte-repo:hover {
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevadaHover);
+}
+.fonte-repo:active {
+  transform: scale(0.97);
 }
 .fonte-repo .texto {
   flex: 1;
@@ -447,12 +476,17 @@ mark {
   text-align: left;
   cursor: pointer;
   font: inherit;
-  background: var(--corFundoBarraLateralSecundaria);
+  background: var(--superficieLateralSecundaria);
   color: var(--corTextoBarraLateralSecundaria);
-  transition: background 0.18s;
+  transition:
+    background var(--dur-curta) ease,
+    transform var(--dur-toque) var(--ease-out);
 }
 .estado-sync:hover {
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevadaHover);
+}
+.estado-sync:active {
+  transform: scale(0.98);
 }
 .estado-sync .linha {
   display: flex;
@@ -480,6 +514,7 @@ mark {
   height: 6px;
   border-radius: 50%;
   background: var(--corDestaque);
+  box-shadow: 0 0 8px var(--corDestaque);
   flex: none;
   animation: respirar 2.6s ease-in-out infinite;
 }
@@ -489,23 +524,7 @@ mark {
 
 /* ---------- Área de conteúdo ---------- */
 .visualizacao {
-  background:
-    radial-gradient(
-      circle at 8% 8%,
-      var(--corBrilhoFundoPrimario),
-      transparent 30%
-    ),
-    radial-gradient(
-      circle at 92% 24%,
-      var(--corBrilhoFundoSecundario),
-      transparent 34%
-    ),
-    radial-gradient(
-      circle at 56% 108%,
-      var(--corBrilhoFundoTerciario),
-      transparent 36%
-    ),
-    var(--corFundoVisualizacao);
+  background: transparent;
   color: var(--corTextoVisualizacao);
   overflow-y: auto;
   overflow-x: hidden;
@@ -551,23 +570,21 @@ mark {
   font-family: var(--fonteUi);
   font-weight: 600;
   font-size: 12px;
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoPopUp);
   cursor: pointer;
   white-space: nowrap;
   flex: none;
   transition:
-    background 0.16s,
-    color 0.16s,
-    transform 0.12s,
-    opacity 0.16s;
+    background var(--dur-curta) ease,
+    color var(--dur-curta) ease,
+    box-shadow var(--dur-curta) ease,
+    filter var(--dur-curta) ease,
+    transform var(--dur-toque) var(--ease-out),
+    opacity var(--dur-curta) ease;
 }
 .btn:hover {
-  background: color-mix(
-    in srgb,
-    var(--corTextoJanela) 18%,
-    var(--corFundoPopUp)
-  );
+  background: var(--superficieElevadaHover);
 }
 .btn:active {
   transform: scale(0.97);
@@ -577,7 +594,7 @@ mark {
   cursor: not-allowed;
 }
 .btn:disabled:hover {
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
 }
 .btn-g {
   height: 37px;
@@ -586,16 +603,38 @@ mark {
   border-radius: var(--raio-m);
 }
 .btn-primario {
-  background: var(--corFundoDestaque);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--gradienteMarca);
   color: var(--corTextoDestaque);
-  box-shadow: 0 5px 18px var(--corFundoDestaqueSuave);
+  box-shadow: var(--brilhoPrimario);
 }
 .btn-primario:hover {
-  background: color-mix(
-    in srgb,
-    var(--corTextoDestaque) 12%,
-    var(--corDestaque)
+  background: var(--gradienteMarca);
+  box-shadow: var(--brilhoPrimarioForte);
+  filter: brightness(1.06) saturate(1.1);
+}
+/* Reflexo que atravessa o botão principal quando o cursor chega. */
+.btn-primario::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    color-mix(in oklab, white 34%, transparent) 50%,
+    transparent 70%
   );
+  transform: translateX(-110%);
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-primario:hover::after {
+    transform: translateX(110%);
+    transition: transform 0.7s var(--ease-out);
+  }
 }
 .btn-sucesso {
   background: var(--corFundoSucesso);
@@ -646,7 +685,7 @@ mark {
   background: linear-gradient(
     90deg,
     var(--corFundoDestaqueSuave) var(--progresso, 0%),
-    var(--corFundoPopUp) var(--progresso, 0%)
+    var(--superficieElevada) var(--progresso, 0%)
   );
   color: var(--corTextoJanela);
   font-family: var(--fonteMono);
@@ -656,8 +695,7 @@ mark {
   background: linear-gradient(
     90deg,
     var(--corFundoDestaqueSuave) var(--progresso, 0%),
-    color-mix(in srgb, var(--corTextoJanela) 18%, var(--corFundoPopUp))
-      var(--progresso, 0%)
+    var(--superficieElevadaHover) var(--progresso, 0%)
   );
 }
 .btn-instalado .rotulo-hover {
@@ -709,11 +747,12 @@ mark {
 
 /* ---------- Cartões ---------- */
 .cartao {
-  background: var(--corFundoCartao);
+  background: var(--superficieCartao);
   color: var(--corTextoCartao);
   border-radius: var(--raio-g);
   padding: 15px;
-  border: 1px solid var(--corBordaTerciaria);
+  border: 1px solid var(--corBordaVidro);
+  box-shadow: var(--sombraCartao);
 }
 .grade-cartoes {
   display: grid;
@@ -725,6 +764,61 @@ mark {
   flex-direction: column;
   gap: 11px;
 }
+
+/* Holofote: um brilho na cor do pacote que segue o cursor dentro do cartão
+   (a posição vem do luzes.js). Só aparece com mouse. */
+@property --holofote-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -999px;
+}
+@property --holofote-y {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -999px;
+}
+.cartao-app,
+.destaque,
+.cartao-categoria,
+.item-fila {
+  position: relative;
+  isolation: isolate;
+}
+.cartao-app::before,
+.destaque::before,
+.cartao-categoria::before,
+.item-fila::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(
+    220px circle at var(--holofote-x) var(--holofote-y),
+    color-mix(in oklab, var(--tom, var(--corDestaque)) 18%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-media) ease;
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cartao-app:hover::before,
+  .destaque:hover::before,
+  .cartao-categoria:hover::before,
+  .item-fila:hover::before {
+    opacity: 1;
+  }
+}
+/* O cartão herda o tom do próprio ícone para o holofote e a borda. */
+.cartao-app:has(.tom-0),
+.item-fila:has(.tom-0) { --tom: var(--vivoPrimario); }
+.cartao-app:has(.tom-1),
+.item-fila:has(.tom-1) { --tom: var(--vivoSecundario); }
+.cartao-app:has(.tom-2),
+.item-fila:has(.tom-2) { --tom: var(--vivoTerciario); }
+.cartao-app:has(.tom-3),
+.item-fila:has(.tom-3) { --tom: color-mix(in oklab, var(--vivoSecundario), var(--vivoTerciario)); }
 .cartao-app h3 {
   margin: 0;
   font-size: 13.5px;
@@ -772,20 +866,30 @@ mark {
 }
 
 a.cartao,
+.cartao-app,
 .cartao-categoria,
 .cartao-indice {
   transition:
-    transform 0.18s cubic-bezier(0.2, 0.8, 0.3, 1),
-    background 0.18s,
-    box-shadow 0.18s;
+    transform var(--dur-media) var(--ease-out),
+    background var(--dur-curta) ease,
+    border-color var(--dur-curta) ease,
+    box-shadow var(--dur-media) ease;
 }
 a.cartao:hover,
+.cartao-app:hover,
 .cartao-categoria:hover,
 .cartao-indice:hover {
-  transform: translateY(-2px);
-  background: var(--corFundoCartaoHover);
-  border-color: var(--corBordaSecundaria);
-  box-shadow: 0 10px 26px var(--corSombraColorida);
+  background: var(--superficieCartaoHover);
+  border-color: color-mix(in oklab, var(--tom, var(--corAcentoSecundario)) 38%, transparent);
+  box-shadow: var(--sombraCartaoHover);
+}
+@media (hover: hover) and (pointer: fine) {
+  a.cartao:hover,
+  .cartao-app:hover,
+  .cartao-categoria:hover,
+  .cartao-indice:hover {
+    transform: translateY(-2px);
+  }
 }
 .cartao-indice {
   color: inherit;
@@ -797,21 +901,33 @@ a.cartao:hover,
   color: var(--corDestaque);
 }
 
-/* Ícones: monograma sobre a trama neutra, ângulo estável por pacote. */
+/* Ícones: monograma sobre um degradê no tom do pacote (tom-0…3 vem do macro
+   `icone`), com ângulo estável por pacote. */
 .icone-app {
+  --tom-icone: var(--tom, var(--vivoTerciario));
   border-radius: 11px;
   flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: repeating-linear-gradient(
-    var(--angulo, 135deg),
-    var(--corPlaceholderA) 0 5px,
-    var(--corPlaceholderB) 5px 10px
-  );
+  background:
+    radial-gradient(
+      circle at 28% 18%,
+      color-mix(in oklab, var(--tom-icone) 46%, transparent),
+      transparent 64%
+    ),
+    linear-gradient(
+      var(--angulo, 135deg),
+      color-mix(in oklab, var(--tom-icone) 40%, var(--corFundoCartao)),
+      color-mix(in oklab, var(--tom-icone) 12%, var(--corFundoCartao))
+    );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--tom-icone) 30%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 12%, transparent);
   font-family: var(--fonteUi);
   font-weight: 700;
-  color: var(--corTextoTerciario);
+  color: var(--tom-icone);
+  text-shadow: 0 0 18px color-mix(in oklab, var(--tom-icone) 60%, transparent);
   font-size: 15px;
   letter-spacing: -0.02em;
   user-select: none;
@@ -867,31 +983,85 @@ a.cartao:hover,
     transform 0.18s,
     box-shadow 0.18s;
 }
-.captura-imagem:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.36);
+@media (hover: hover) and (pointer: fine) {
+  .captura-imagem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.36);
+  }
 }
 
 /* ---------- Destaque da home ---------- */
 .destaque-carrossel {
   position: relative;
 }
+/* O cartão grande da home. É visto uma vez por abertura, então pode ter um
+   pouco mais de vida: a borda é um anel de luz que gira devagar. */
+@property --giro {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
 .destaque {
+  --tom: var(--corDestaque);
   display: flex;
   gap: 20px;
   padding: 22px;
   border-radius: 14px;
-  background: linear-gradient(
-    120deg,
-    var(--corFundoCartao) 0%,
-    var(--corFundoSecundarioSuave) 58%,
-    var(--corFundoTerciarioSuave) 100%
+  background:
+    radial-gradient(
+      90% 140% at 0% 0%,
+      color-mix(in oklab, var(--corDestaque) 16%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(
+      120deg,
+      var(--superficieCartao) 0%,
+      var(--corFundoSecundarioSuave) 62%,
+      var(--corFundoTerciarioSuave) 100%
+    );
+  border: 1px solid transparent;
+  box-shadow:
+    0 18px 50px -18px var(--corSombraColorida),
+    0 0 0 1px var(--corBordaVidro);
+}
+.destaque::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--giro),
+    transparent 0deg,
+    var(--corDestaque) 50deg,
+    var(--corAcentoTerciario) 110deg,
+    transparent 160deg,
+    transparent 200deg,
+    var(--corAcentoSecundario) 260deg,
+    transparent 320deg
   );
-  border: 1px solid var(--corBordaSecundaria);
-  box-shadow: 0 12px 30px var(--corSombraColorida);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  animation: girar-borda 9s linear infinite;
+  pointer-events: none;
+}
+@keyframes girar-borda {
+  to {
+    --giro: 360deg;
+  }
+}
+.destaque .icone-app {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--tom-icone) 36%, transparent),
+    0 14px 36px -10px color-mix(in oklab, var(--tom-icone) 60%, transparent);
 }
 .destaque.deslizando-direita {
-  animation: deslizar 0.42s cubic-bezier(0.2, 0.8, 0.3, 1);
+  animation: deslizar var(--dur-media) var(--ease-out);
 }
 .destaque-texto {
   display: flex;
@@ -906,6 +1076,11 @@ a.cartao:hover,
   font-size: 10px;
   letter-spacing: 0.16em;
   color: var(--corDestaque);
+  background: var(--gradienteMarca);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  width: fit-content;
 }
 .destaque h1 {
   margin: 0;
@@ -947,7 +1122,7 @@ a.cartao:hover,
   border-radius: 2px;
   padding: 0;
   cursor: pointer;
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   transition:
     background 0.2s,
     width 0.2s;
@@ -967,8 +1142,12 @@ a.cartao:hover,
   flex-wrap: wrap;
   padding: 14px 18px;
   border-radius: var(--raio-g);
-  background: var(--corFundoDestaqueSuave);
-  border: 1px solid color-mix(in srgb, var(--corDestaque) 24%, transparent);
+  background: linear-gradient(
+    100deg,
+    var(--corFundoDestaqueSuave),
+    var(--corFundoTerciarioSuave)
+  );
+  border: 1px solid color-mix(in oklab, var(--corDestaque) 28%, transparent);
 }
 .faixa-texto {
   display: flex;
@@ -1008,13 +1187,14 @@ a.cartao:hover,
 }
 .barra-categoria {
   width: 8px;
-  height: 28px;
+  height: 38px;
   border-radius: 4px;
   flex: none;
-  transition: height 0.2s;
+  transform: scaleY(0.74);
+  transition: transform var(--dur-media) var(--ease-out);
 }
 .cartao-categoria:hover .barra-categoria {
-  height: 38px;
+  transform: none;
 }
 .cartao-categoria h3 {
   margin: 0;
@@ -1034,9 +1214,6 @@ a.cartao:hover,
   padding: 26px;
   flex: 1;
   justify-content: center;
-  transition:
-    flex-grow 0.28s,
-    padding 0.28s;
 }
 /* Com resultados na tela a barra encolhe e sobe para o topo. */
 .busca-central.compacta {
@@ -1046,7 +1223,9 @@ a.cartao:hover,
   position: sticky;
   top: 0;
   z-index: 4;
-  background: var(--corFundoVisualizacao);
+  background: var(--superficieFixa);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
 }
 .marca-busca {
   display: flex;
@@ -1055,11 +1234,10 @@ a.cartao:hover,
   gap: 8px;
   text-align: center;
   overflow: hidden;
-  transition:
-    opacity 0.22s,
-    max-height 0.28s,
-    margin 0.28s;
-  max-height: 200px;
+  /* Folga para o halo do glifo não ser cortado pelo overflow. */
+  padding: 22px 22px 0;
+  margin-top: -22px;
+  max-height: 222px;
   opacity: 1;
 }
 .busca-central.compacta .marca-busca,
@@ -1067,14 +1245,44 @@ a.cartao:hover,
   max-height: 0;
   opacity: 0;
   margin: 0;
+  padding: 0;
   pointer-events: none;
 }
+/* O glifo da busca é um orbe: degradê da marca com um halo que respira. */
 .glifo-grande {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: var(--corDestaque);
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.3, 1);
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--gradienteMarca);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, white 14%, transparent) inset,
+    0 16px 40px -10px color-mix(in oklab, var(--corDestaque) 70%, transparent);
+  transition: transform 0.5s var(--ease-out);
+}
+.glifo-grande::before {
+  content: "";
+  position: absolute;
+  inset: -18px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--corLuzQuente) 55%, transparent),
+    transparent
+  );
+  animation: halo 4.8s ease-in-out infinite;
+}
+@keyframes halo {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
 }
 .busca-central:hover .glifo-grande {
   transform: rotate(45deg) scale(1.06);
@@ -1084,6 +1292,14 @@ a.cartao:hover,
   font-size: 27px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  background: linear-gradient(
+    100deg,
+    var(--corTextoJanela) 30%,
+    color-mix(in oklab, var(--corDestaque) 70%, var(--corTextoJanela)) 70%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .marca-busca p {
   margin: 0;
@@ -1099,31 +1315,26 @@ a.cartao:hover,
   max-width: 560px;
   height: 50px;
   padding: 0 20px;
-  background: var(--corFundoCartao);
-  border: 1.5px solid transparent;
+  background: var(--superficieCartao);
+  border: 1.5px solid var(--corBordaVidro);
   border-radius: 26px;
   color: var(--corTextoTerciario);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 10px 34px -10px color-mix(in oklab, var(--corFundoJanela) 90%, transparent);
+  view-transition-name: campo-busca;
   transition:
-    height 0.24s,
-    max-width 0.24s,
-    border-color 0.2s,
-    box-shadow 0.2s,
-    background 0.2s;
+    border-color var(--dur-curta) ease,
+    box-shadow var(--dur-media) ease,
+    background var(--dur-curta) ease;
 }
 .campo-central-envolucro:hover {
-  background: color-mix(
-    in srgb,
-    var(--corTextoJanela) 4%,
-    var(--corFundoCartao)
-  );
+  background: var(--superficieCartaoHover);
 }
 .campo-central-envolucro:focus-within {
   border-color: var(--corDestaque);
   color: var(--corTextoJanela);
   box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--corDestaque) 16%, transparent),
-    0 6px 22px rgba(0, 0, 0, 0.28);
+    0 0 0 4px color-mix(in oklab, var(--corDestaque) 18%, transparent),
+    0 14px 44px -12px color-mix(in oklab, var(--corDestaque) 55%, transparent);
 }
 .busca-central.compacta .campo-central-envolucro {
   height: 42px;
@@ -1169,7 +1380,7 @@ a.cartao:hover,
   flex: none;
   border: 0;
   border-radius: 50%;
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoSecundario);
   font-size: 11px;
   cursor: pointer;
@@ -1192,10 +1403,6 @@ a.cartao:hover,
   justify-content: center;
   max-width: 620px;
   overflow: hidden;
-  transition:
-    opacity 0.22s,
-    max-height 0.28s,
-    margin 0.28s;
   max-height: 120px;
   opacity: 1;
 }
@@ -1203,12 +1410,24 @@ a.cartao:hover,
   display: none;
 }
 /* Na busca quem gruda no topo é a barra de busca, não a de filtros. */
-.pilha-busca .barra-filtros,
+/* Barras que grudam no topo, uma embaixo da outra. Os valores são as
+   alturas reais da busca compacta e da barra de filtros (1px a menos, para
+   sobrepor e não deixar fresta). */
+.pilha {
+  --topo-filtros: 0px;
+  --altura-filtros: 53px;
+}
+.pilha-busca {
+  --topo-filtros: 115px;
+  --altura-filtros: 41px;
+}
+.pilha .barra-filtros {
+  top: var(--topo-filtros);
+}
 .cabecalho-tabela {
   position: sticky;
-  top: 110px;
-  z-index: 99;
-  background: var(--corFundoVisualizacao);
+  top: calc(var(--topo-filtros, 0px) + var(--altura-filtros, 0px));
+  z-index: 3;
 }
 
 /* ---------- Filtros ---------- */
@@ -1218,7 +1437,14 @@ a.cartao:hover,
   gap: 8px;
   flex-wrap: wrap;
   padding: 11px 18px;
-  background: var(--corFundoBarraLateralSecundaria);
+  background: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--superficieBase) 86%, var(--corFundoAcentoSecundario)) 97%,
+    transparent
+  );
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-block: 1px solid var(--corBordaVidro);
   position: sticky;
   top: 0;
   z-index: 3;
@@ -1235,30 +1461,28 @@ a.cartao:hover,
   border: 0;
   border-radius: 20px;
   font-family: var(--fonteUi);
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoSecundario);
   font-size: 12px;
   cursor: pointer;
   transition:
-    background 0.16s,
-    color 0.16s,
-    transform 0.12s;
+    background var(--dur-curta) ease,
+    color var(--dur-curta) ease,
+    box-shadow var(--dur-curta) ease,
+    transform var(--dur-toque) var(--ease-out);
 }
 .chip:hover {
-  background: color-mix(
-    in srgb,
-    var(--corTextoJanela) 14%,
-    var(--corFundoPopUp)
-  );
+  background: var(--superficieElevadaHover);
   color: var(--corTextoJanela);
 }
 .chip:active {
   transform: scale(0.96);
 }
 .chip.ativo {
-  background: var(--corFundoDestaque);
+  background: var(--gradienteMarca);
   color: var(--corTextoDestaque);
   font-weight: 600;
+  box-shadow: var(--brilhoPrimario);
 }
 .chip-remover {
   display: inline-flex;
@@ -1284,24 +1508,21 @@ a.cartao:hover,
   border-radius: var(--raio-p);
   padding: 4px 8px;
   cursor: pointer;
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoJanela);
   font-family: var(--fonteUi);
   font-size: 12px;
   font-weight: 600;
 }
 .seletor-ordem:hover {
-  background: color-mix(
-    in srgb,
-    var(--corTextoJanela) 14%,
-    var(--corFundoPopUp)
-  );
+  background: var(--superficieElevadaHover);
 }
 
 /* ---------- Tabela de pacotes ---------- */
 .tabela {
   display: flex;
   flex-direction: column;
+  background: var(--superficieLeitura);
 }
 .linha-pacote {
   display: grid;
@@ -1319,7 +1540,9 @@ a.cartao:hover,
 }
 .cabecalho-tabela {
   min-height: 30px;
-  background: var(--corFundoVisualizacao);
+  background: var(--superficieFixa);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
   font-family: var(--fonteMono);
   font-weight: 600;
   font-size: 10px;
@@ -1328,10 +1551,15 @@ a.cartao:hover,
 }
 .linha-pacote:not(.cabecalho-tabela) {
   border-bottom: 1px solid var(--corSeparador);
-  transition: background 0.14s;
+  transition: background var(--dur-curta) ease;
 }
 .linha-pacote:not(.cabecalho-tabela):hover {
-  background: var(--corFundoBarraLateralSecundaria);
+  background: linear-gradient(
+    90deg,
+    var(--corFundoDestaqueSuave),
+    var(--corFundoTerciarioSuave) 60%,
+    transparent
+  );
 }
 .nome-pacote {
   display: flex;
@@ -1409,29 +1637,26 @@ a.cartao:hover,
 .barra-progresso {
   height: 4px;
   border-radius: 2px;
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   overflow: hidden;
 }
 .barra-progresso > i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--corDestaque), var(--corAcentoSecundario), var(--corAcentoTerciario));
-  transition: width 0.28s cubic-bezier(0.3, 0.7, 0.4, 1);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--vivoPrimario), var(--vivoTerciario), var(--vivoSecundario));
+  box-shadow: 0 0 12px color-mix(in oklab, var(--vivoPrimario) 60%, transparent);
 }
 .barra-progresso.alta {
   flex: none;
   height: 5px;
   border-radius: 3px;
 }
+/* Barra de instalação: o degradê corre por dentro enquanto trabalha. */
 .barra-progresso.alta > i {
-  background: linear-gradient(
-    90deg,
-    var(--corDestaque) 0%,
-    color-mix(in srgb, var(--corSucesso) 60%, var(--corDestaque)) 50%,
-    var(--corDestaque) 100%
-  );
-  background-size: 200% 100%;
-  animation: correr 1.8s linear infinite;
+  background: var(--gradienteProgresso);
+  background-size: 300% 100%;
+  animation: correr 2.4s linear infinite;
 }
 
 /* ---------- Barra de estado ---------- */
@@ -1441,7 +1666,12 @@ a.cartao:hover,
   gap: 10px;
   min-height: 32px;
   padding: 0 18px;
-  background: var(--corFundoBarraCabecalho);
+  background: var(--superficieCabecalho);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+  border-top: 1px solid var(--corBordaVidro);
+  position: relative;
+  z-index: 1;
   font-family: var(--fonteMono);
   font-size: 11px;
   color: var(--corTextoTerciario);
@@ -1538,7 +1768,8 @@ a.cartao:hover,
   flex-wrap: wrap;
   padding: 13px 16px;
   border-radius: var(--raio-g);
-  background: var(--corFundoCartao);
+  background: var(--superficieCartao);
+  border: 1px solid var(--corBordaVidro);
 }
 .faixa-progresso .barra-progresso {
   flex: 1;
@@ -1606,7 +1837,8 @@ a.cartao:hover,
 }
 
 .painel-lateral {
-  background: var(--corFundoBarraLateral);
+  background: var(--superficieLateral);
+  border-left: 1px solid var(--corBordaVidro);
   color: var(--corTextoBarraLateral);
   padding: 22px;
   display: flex;
@@ -1665,19 +1897,15 @@ a.cartao:hover,
   padding: 4px 9px;
   border: 0;
   border-radius: 6px;
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoSecundario);
   transition:
-    background 0.16s,
-    color 0.16s;
+    background var(--dur-curta) ease,
+    color var(--dur-curta) ease;
 }
 a.dep:hover,
 button.dep:hover {
-  background: color-mix(
-    in srgb,
-    var(--corTextoJanela) 16%,
-    var(--corFundoPopUp)
-  );
+  background: var(--corFundoTerciarioSuave);
   color: var(--corTextoJanela);
 }
 button.dep {
@@ -1690,7 +1918,7 @@ button.dep {
 
 .pkgbuild {
   border-radius: var(--raio-m);
-  background: var(--corFundoVisualizacao);
+  background: var(--superficieBase);
   padding: 11px 12px;
   font-family: var(--fonteMono);
   font-size: 10.5px;
@@ -1828,8 +2056,9 @@ button.dep {
   border-radius: var(--raio-p);
   font-size: 12px;
   transition:
-    opacity 0.16s,
-    background 0.16s;
+    opacity var(--dur-curta) ease,
+    background var(--dur-curta) ease,
+    transform var(--dur-toque) var(--ease-out);
 }
 .btn-cancelar:hover {
   background: var(--corFundoDestrutivoSuave);
@@ -1840,7 +2069,7 @@ button.dep {
   padding: 14px;
   border-radius: var(--raio-g);
   flex: none;
-  background: var(--corFundoBarraLateralSecundaria);
+  background: var(--superficieLateralSecundaria);
   display: flex;
   flex-direction: column;
   gap: 7px;
@@ -1857,7 +2086,9 @@ button.dep {
   display: flex;
   flex-direction: column;
   border-radius: var(--raio-g);
-  background: var(--corFundoCartao);
+  background: color-mix(in oklab, var(--superficieBase) 86%, transparent);
+  border: 1px solid var(--corBordaVidro);
+  box-shadow: var(--sombraCartao);
   overflow: hidden;
 }
 .terminal-cabecalho {
@@ -1865,7 +2096,7 @@ button.dep {
   align-items: center;
   gap: 10px;
   padding: 11px 15px;
-  background: var(--corFundoBarraLateralSecundaria);
+  background: var(--superficieLateralSecundaria);
   flex: none;
 }
 .terminal-cabecalho .rotulo {
@@ -1927,7 +2158,7 @@ button.dep {
   font-style: italic;
 }
 .linha-nova {
-  animation: entrar-linha 0.24s ease-out;
+  animation: entrar-linha var(--dur-media) var(--ease-out);
 }
 .caret {
   display: inline-block;
@@ -1949,13 +2180,13 @@ button.dep {
   padding: 40px;
   text-align: center;
   border-radius: var(--raio-g);
-  background: var(--corFundoCartao);
+  background: var(--superficieCartao);
 }
 .progresso-simples .roda {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  border: 7px solid var(--corFundoPopUp);
+  border: 7px solid var(--superficieElevada);
   border-top-color: var(--corDestaque);
   animation: girar 1.1s linear infinite;
 }
@@ -2021,32 +2252,36 @@ button.dep {
   padding: 11px 15px;
   border-radius: var(--raio-m);
   max-width: min(360px, calc(100vw - 36px));
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoPopUp);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--corBordaVidro);
+  box-shadow:
+    0 16px 40px -8px rgba(0, 0, 0, 0.55),
+    0 0 0 1px color-mix(in oklab, var(--corDestaque) 10%, transparent);
   font-size: 12.5px;
-  opacity: 0;
-  transform: translateY(10px) scale(0.98);
-  transition:
-    opacity 0.22s,
-    transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1);
-}
-.aviso-flutuante {
-  animation: aparecer-sumir 4.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  /* Entra rápido (240ms), fica, e sai mais rápido ainda. */
+  animation: aparecer-sumir 4.5s linear forwards;
 }
 @keyframes aparecer-sumir {
   0% {
     opacity: 0;
-    transform: translateY(10px) scale(0.98);
+    transform: translateY(100%) scale(0.96);
+    filter: blur(4px);
+    animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   }
-  6%,
-  80% {
+  5.4% {
     opacity: 1;
     transform: none;
+    filter: none;
+  }
+  95.5% {
+    opacity: 1;
+    transform: none;
+    animation-timing-function: ease-out;
   }
   100% {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px) scale(0.98);
     visibility: hidden;
   }
 }
@@ -2055,6 +2290,8 @@ button.dep {
   height: 6px;
   border-radius: 50%;
   background: var(--corDestaque);
+  box-shadow: 0 0 8px currentColor;
+  color: var(--corDestaque);
   flex: none;
 }
 .aviso-ok .marcador {
@@ -2071,19 +2308,25 @@ button.dep {
   border-radius: var(--raio-g);
   width: min(620px, calc(100vw - 40px));
   max-height: min(84vh, 760px);
-  background: var(--corFundoDialogo);
+  background: color-mix(in oklab, var(--corFundoDialogo) 84%, var(--corFundoAcentoTerciario));
   color: var(--corTextoDialogo);
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.6),
+    0 0 0 1px var(--corBordaVidro);
   flex-direction: column;
   overflow: hidden;
 }
 .dialogo[open] {
   display: flex;
-  animation: abrir-dialogo 0.2s cubic-bezier(0.2, 0.8, 0.3, 1);
+  animation: abrir-dialogo var(--dur-media) var(--ease-out);
 }
 .dialogo::backdrop {
-  background: rgba(0, 0, 0, 0.58);
-  backdrop-filter: blur(2px);
+  background: color-mix(in oklab, var(--corFundoJanela) 62%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.dialogo[open]::backdrop {
+  animation: entrar-fundo var(--dur-media) ease-out;
 }
 .dialogo-largo {
   width: min(920px, calc(100vw - 40px));
@@ -2112,7 +2355,7 @@ button.dep {
   background: transparent;
 }
 .dialogo-cabecalho .btn-fechar:hover {
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
 }
 .dialogo-corpo {
   padding: 18px;
@@ -2137,15 +2380,17 @@ button.dep {
   z-index: 70;
   min-width: 218px;
   padding: 5px;
-  background: var(--corFundoPopUp);
+  background: var(--superficieElevada);
   color: var(--corTextoPopUp);
+  border: 1px solid var(--corBordaVidro);
   border-radius: var(--raio-m);
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(0.97);
+  transform-origin: top left;
   transition:
-    opacity 0.14s,
-    transform 0.14s;
+    opacity var(--dur-curta) var(--ease-out),
+    transform var(--dur-curta) var(--ease-out);
 }
 .menu-suspenso.visivel {
   opacity: 1;
@@ -2235,8 +2480,10 @@ button.dep {
   position: absolute;
   inset: 0;
   border-radius: 12px;
-  background: var(--corFundoPopUp);
-  transition: background 0.2s;
+  background: var(--superficieElevada);
+  transition:
+    background var(--dur-media) ease,
+    box-shadow var(--dur-media) ease;
 }
 .interruptor i::after {
   content: "";
@@ -2248,11 +2495,12 @@ button.dep {
   border-radius: 50%;
   background: var(--corTextoTerciario);
   transition:
-    transform 0.2s cubic-bezier(0.2, 0.8, 0.3, 1),
-    background 0.2s;
+    transform var(--dur-media) var(--ease-out),
+    background var(--dur-media) ease;
 }
 .interruptor-entrada:checked + i {
-  background: var(--corFundoDestaque);
+  background: var(--gradienteMarca);
+  box-shadow: var(--brilhoPrimario);
 }
 .interruptor-entrada:checked + i::after {
   transform: translateX(18px);
@@ -2270,7 +2518,7 @@ button.dep {
   resize: vertical;
   border: 1px solid var(--corSeparador);
   border-radius: var(--raio-m);
-  background: var(--corFundoVisualizacao);
+  background: var(--superficieBase);
   color: var(--corTextoJanela);
   font-family: var(--fonteMono);
   font-size: 11.5px;
@@ -2298,7 +2546,7 @@ button.dep {
   gap: 7px;
   padding: 5px 9px 5px 5px;
   border-radius: 20px;
-  background: var(--corFundoVisualizacao);
+  background: var(--superficieBase);
 }
 .amostra i {
   width: 18px;
@@ -2339,14 +2587,28 @@ button.dep {
 }
 
 /* ---------- Animações ---------- */
+/* Entrada: sobe pouco e desfoca levemente — o blur junta o "antes" e o
+   "depois" num movimento só, em vez de um fade seco. */
 @keyframes entrar {
   from {
     opacity: 0;
-    transform: translateY(7px);
+    transform: translateY(10px) scale(0.985);
+    filter: blur(3px);
   }
   to {
     opacity: 1;
     transform: none;
+    filter: none;
+  }
+}
+@keyframes entrar-fundo {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes so-aparecer {
+  from {
+    opacity: 0;
   }
 }
 @keyframes deslizar {
@@ -2421,43 +2683,147 @@ button.dep {
   }
 }
 
-/* Entrada dos itens. Sem JavaScript: o atraso vem da posição na lista. */
+/* Entrada dos itens. Sem JavaScript: o atraso vem da posição na lista,
+   45ms entre um e outro, e o último começa no máximo em 315ms. */
 .grade-cartoes > *,
 .item-fila,
 .linha-pacote:not(.cabecalho-tabela),
 .destaque,
+.faixa-atualizacoes,
 .secao > .cartao {
-  animation: entrar 0.34s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  animation: entrar 0.42s var(--ease-out) backwards;
+  animation-delay: calc(var(--ordem, 0) * 45ms);
 }
-.grade-cartoes > *:nth-child(2),
+.grade-cartoes > :nth-child(2),
 .item-fila:nth-child(2),
-.linha-pacote:nth-child(3) {
-  animation-delay: 40ms;
-}
-.grade-cartoes > *:nth-child(3),
+.linha-pacote:nth-child(3) { --ordem: 1; }
+.grade-cartoes > :nth-child(3),
 .item-fila:nth-child(3),
-.linha-pacote:nth-child(4) {
-  animation-delay: 80ms;
-}
-.grade-cartoes > *:nth-child(4),
+.linha-pacote:nth-child(4) { --ordem: 2; }
+.grade-cartoes > :nth-child(4),
 .item-fila:nth-child(4),
-.linha-pacote:nth-child(5) {
-  animation-delay: 120ms;
-}
-.grade-cartoes > *:nth-child(n + 5),
-.linha-pacote:nth-child(n + 6) {
-  animation-delay: 160ms;
+.linha-pacote:nth-child(5) { --ordem: 3; }
+.grade-cartoes > :nth-child(5),
+.item-fila:nth-child(5),
+.linha-pacote:nth-child(6) { --ordem: 4; }
+.grade-cartoes > :nth-child(6),
+.item-fila:nth-child(6),
+.linha-pacote:nth-child(7) { --ordem: 5; }
+.grade-cartoes > :nth-child(n + 7),
+.item-fila:nth-child(n + 7),
+.linha-pacote:nth-child(n + 8) { --ordem: 6; }
+
+/* A segunda grade da home começa depois da primeira, como uma onda só. */
+.secao + .secao + .secao .grade-cartoes > * {
+  animation-delay: calc(120ms + var(--ordem, 0) * 45ms);
 }
 
-/* Desligar animações: preferência do sistema ou interruptor em Configurações. */
+/* Centenas de linhas de resultado não precisam de entrada individual. */
+.pilha-busca .linha-pacote:not(.cabecalho-tabela) {
+  animation: none;
+}
+
+/* A mesma página aberta de novo (a fila se recarrega a cada 2 s, ou clicar
+   no item do menu que já está aberto): nada entra de novo. */
+.repeticao .grade-cartoes > *,
+.repeticao .item-fila,
+.repeticao .linha-pacote,
+.repeticao .destaque,
+.repeticao .faixa-atualizacoes,
+.repeticao .secao > .cartao {
+  animation: none;
+}
+
+/* ---------- Transição entre páginas ----------
+   Cada clique no menu é uma página nova vinda do Flask. Com a View
+   Transitions API o navegador faz a ponte: o conteúdo troca com um
+   cruzamento curto, a pílula do menu desliza até o item novo e o campo de
+   busca do cabeçalho voa até o centro da tela de busca (e volta).
+   Navegador sem suporte simplesmente troca de página como antes. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+::view-transition-group(*) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
+}
+::view-transition-old(root) {
+  animation: 140ms ease-out both vt-sair;
+}
+::view-transition-new(root) {
+  animation: 260ms cubic-bezier(0.23, 1, 0.32, 1) both vt-entrar;
+}
+::view-transition-old(campo-busca),
+::view-transition-new(campo-busca) {
+  height: 100%;
+  animation-duration: 260ms;
+}
+@keyframes vt-sair {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-entrar {
+  from {
+    opacity: 0;
+  }
+}
+.sem-animacoes::view-transition-group(*),
+.sem-animacoes::view-transition-old(*),
+.sem-animacoes::view-transition-new(*) {
+  animation: none !important;
+}
+
+/* Desligar animações: preferência do sistema ou interruptor em Configurações.
+   Movimento reduzido não é zero movimento: tudo que se desloca vira um
+   fade curto, e as cores continuam fazendo transição. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
+  .grade-cartoes > *,
+  .item-fila,
+  .linha-pacote:not(.cabecalho-tabela),
+  .destaque,
+  .faixa-atualizacoes,
+  .secao > .cartao,
+  .dialogo[open] {
+    animation: so-aparecer 0.2s ease backwards;
+  }
+  .destaque::after,
+  .glifo-grande::before,
+  .barra-progresso.alta > i,
+  .pulso {
+    animation: none;
+  }
+  .btn-primario::after {
+    display: none;
+  }
+  a.cartao:hover,
+  .cartao-app:hover,
+  .cartao-categoria:hover,
+  .cartao-indice:hover,
+  .btn:active,
+  .chip:active {
+    transform: none;
+  }
+  .aviso-flutuante {
+    animation-name: aparecer-sumir-suave;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+@keyframes aparecer-sumir-suave {
+  0% {
+    opacity: 0;
+  }
+  5%,
+  95% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
   }
 }
 .sem-animacoes *,
@@ -2556,7 +2922,7 @@ button.dep {
     left: 60px;
     padding: 4px 8px;
     border-radius: 6px;
-    background: var(--corFundoPopUp);
+    background: var(--superficieElevada);
     color: var(--corTextoPopUp);
     font-size: 11px;
     opacity: 0;
@@ -2600,7 +2966,8 @@ button.dep {
     z-index: 25;
     padding: 12px 10px;
     transform: translateX(-100%);
-    transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.3, 1);
+    transition: transform 0.3s var(--ease-drawer);
+    background: var(--superficieJanela);
     box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
   }
   .lateral-aberta .barra-lateral {
@@ -2612,7 +2979,7 @@ button.dep {
     inset: 0;
     z-index: 24;
     background: rgba(0, 0, 0, 0.5);
-    animation: entrar 0.2s ease-out;
+    animation: entrar-fundo 0.2s ease-out;
   }
   .item-lateral {
     justify-content: flex-start;
