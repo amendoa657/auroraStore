@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Mosaic — filme</title>
+<style>
+  html, body { margin: 0; background: #000; overflow: hidden; }
+  canvas { display: block; width: 1920px; height: 1080px; }
+</style>
+</head>
+<body>
+<canvas id="filme" width="1920" height="1080"></canvas>
+<script type="module">
+  import { preparar, seek } from "./film.js";
+  // O render espera `window.pronto` e depois chama `window.seek(t)` quadro a quadro.
+  window.pronto = preparar().then(() => {
+    window.seek = seek;
+    const t = Number(new URLSearchParams(location.search).get("t") || 0);
+    seek(t);
+    return true;
+  });
+</script>
+</body>
+</html>

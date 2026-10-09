@@ -1,0 +1,8 @@
+{
+  "name": "mosaic-motion",
+  "private": true,
+  "type": "module",
+  "description": "Filme de apresentação do Mosaic: canvas como função pura do tempo, som sintetizado em código.",
+  "scripts": { "render": "node render.mjs", "folha": "node render.mjs --folha" },
+  "dependencies": { "playwright-core": "1.56.1" }
+}
