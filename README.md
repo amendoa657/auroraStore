@@ -1,34 +1,35 @@
 <div align="center">
 
+<img src="assetsReadme/mosaic-marca.svg" alt="" width="72">
+
 # Mosaic
 
-### Uma interface desktop para descobrir, instalar e acompanhar pacotes do Arch Linux.
+### Uma loja de pacotes para o Arch Linux, com a cara do seu wallpaper.
 
-<img src="assetsReadme/aurora-home.png" alt="Mosaic — tela Descobrir" width="100%">
+<img src="assetsReadme/mosaic-showcase.webp" alt="Mosaic em uso: a troca de telas é uma onda de pixels que sai de onde foi o clique" width="100%">
+
+<sub><a href="assetsReadme/mosaic-showcase.mp4">Ver o vídeo em qualidade cheia</a></sub>
 
 <p>
-  <a href="#o-produto-em-uma-olhada">Produto</a> ·
+  <a href="#o-que-é">O que é</a> ·
   <a href="#telas">Telas</a> ·
-  <a href="#rodando-localmente">Rodando localmente</a>
+  <a href="#linguagem-visual">Linguagem visual</a> ·
+  <a href="#rodando-localmente">Rodando localmente</a> ·
+  <a href="#tema-com-o-matugen">Tema</a>
 </p>
 
 </div>
 
-> O Mosaic coloca o `paru` atrás de uma interface calma, rápida e legível — com busca, detalhes da AUR, instalação e saída do build no mesmo fluxo.
+> [!NOTE]
+> **Sobre o uso de IA.** Grande parte do front-end deste projeto (HTML, CSS e JavaScript) foi escrita com a ajuda de IA. A paleta de cores e o sistema de temas a partir do wallpaper, o layout das telas e o nome são meus, e a identidade visual foi conduzida por mim: a direção de arte, o que entrou, o que saiu e o que precisou ser refeito até ficar com a cara que eu queria.
 
-<video src="assetsReadme/showcase.mp4" controls width="100%"></video>
+## O que é
 
-## O produto em uma olhada
+O Mosaic coloca o `paru` atrás de uma interface calma, rápida e legível. Busca, detalhes da AUR, PKGBUILD, instalação e a saída do build ficam no mesmo fluxo, sem abrir terminal.
 
-| Descobrir | Pesquisar | Instalar com contexto |
+| Descobrir | Buscar | Instalar com contexto |
 | --- | --- | --- |
-| Destaques e pacotes populares em cards compactos. | AUR e repositórios oficiais em uma busca única. | Avisos de segurança, PKGBUILD, dependências e progresso visíveis. |
-
-### A linguagem visual
-
-Cada pacote é uma peça do mosaico. A marca são quatro blocos, um em cada cor do tema; atrás do conteúdo, uma grade de pixels em retícula muda de cor devagar, e a troca de tela é uma onda desses mesmos pixels saindo de onde foi o clique. Os botões são teclas: cor chapada e uma borda que some quando a tecla desce.
-
-As cores vêm do wallpaper, geradas pelo [Matugen](https://github.com/InioX/matugen) em `~/.config/mosaic-store/colors.css` — nenhuma cor é fixa no código. Tipografia em **Space Grotesk** com **JetBrains Mono**, servidas pelo próprio app.
+| Destaque e pacotes populares e mais votados da AUR. | AUR e repositórios oficiais numa busca só, local e instantânea. | Aviso de pacote da AUR, PKGBUILD, dependências e o build ao vivo. |
 
 ## Telas
 
@@ -36,67 +37,86 @@ As cores vêm do wallpaper, geradas pelo [Matugen](https://github.com/InioX/matu
   <tr>
     <td width="50%">
       <strong>Descobrir</strong><br>
-      <sub>O ponto de entrada: destaque e descoberta rápida.</sub><br><br>
-      <img src="assetsReadme/aurora-home.png" alt="Tela Descobrir do Mosaic" width="100%">
+      <sub>O ponto de entrada: destaque, populares e mais votados.</sub><br><br>
+      <img src="assetsReadme/mosaic-home.png" alt="Tela Descobrir do Mosaic" width="100%">
     </td>
     <td width="50%">
       <strong>Buscar</strong><br>
-      <sub>Resultados da AUR com versão, descrição e fonte.</sub><br><br>
-      <img src="assetsReadme/aurora-search.png" alt="Tela de busca do Mosaic" width="100%">
+      <sub>A tela vazia, com a marca, antes da primeira busca.</sub><br><br>
+      <img src="assetsReadme/mosaic-busca-inicio.png" alt="Tela de busca do Mosaic antes de buscar" width="100%">
     </td>
   </tr>
   <tr>
+    <td>
+      <strong>Resultados</strong><br>
+      <sub>Versão, votos e fonte de cada pacote, com a AUR sinalizada.</sub><br><br>
+      <img src="assetsReadme/mosaic-busca.png" alt="Resultados de busca no Mosaic" width="100%">
+    </td>
     <td>
       <strong>Detalhes do pacote</strong><br>
-      <sub>PKGBUILD, dependências, votos e o aviso da AUR no lugar certo.</sub><br><br>
-      <img src="assetsReadme/aurora-package.png" alt="Detalhes do pacote paru no Mosaic" width="100%">
-    </td>
-    <td>
-      <strong>Fila de instalação</strong><br>
-      <sub>Uma área dedicada para acompanhar o build e a saída do terminal.</sub><br><br>
-      <img src="assetsReadme/aurora-queue.png" alt="Fila de instalação do Mosaic" width="100%">
+      <sub>Aviso da AUR, dependências e o PKGBUILD à mão antes de instalar.</sub><br><br>
+      <img src="assetsReadme/mosaic-pacote.png" alt="Detalhes do pacote paru no Mosaic" width="100%">
     </td>
   </tr>
   <tr>
     <td>
-      <strong>Atualizações</strong><br>
-      <sub>Estado do sistema e ação de verificação sem ruído.</sub><br><br>
-      <img src="assetsReadme/aurora-updates.png" alt="Tela de atualizações do Mosaic" width="100%">
+      <strong>Fila de instalação</strong><br>
+      <sub>Progresso de cada pacote e a saída do build em tempo real.</sub><br><br>
+      <img src="assetsReadme/mosaic-fila.png" alt="Fila de instalação do Mosaic" width="100%">
     </td>
-    <td valign="top">
-      <strong>O fluxo em cinco passos</strong>
-      <ol>
-        <li>Descubra um pacote.</li>
-        <li>Pesquise na AUR ou nos repositórios oficiais.</li>
-        <li>Leia detalhes e revise o PKGBUILD.</li>
-        <li>Coloque a instalação na fila.</li>
-        <li>Acompanhe o build em tempo real.</li>
-      </ol>
+    <td>
+      <strong>Atualizações</strong><br>
+      <sub>Versão atual, a nova e o tamanho do download.</sub><br><br>
+      <img src="assetsReadme/mosaic-atualizacoes.png" alt="Tela de atualizações do Mosaic" width="100%">
     </td>
   </tr>
 </table>
 
+<sub>As telas da fila, das atualizações e do PKGBUILD foram capturadas com dados de exemplo.</sub>
+
+## Linguagem visual
+
+Cada pacote é uma peça do mosaico.
+
+- **A marca** são quatro blocos, um em cada cor do tema. No hover, o bloco gira um quarto de volta e as cores trocam de lugar.
+- **O fundo** é uma grade de pixels em retícula. Três campos de cor, um por acento do tema, passam devagar por ela, e a força de cada campo vira o tamanho do ponto, como numa separação de cores de impressão. Perto do cursor, os pontos crescem.
+- **A troca de tela** é uma onda desses mesmos pixels que sai de onde foi o clique (ou do centro, quando foi o teclado) e revela a página nova. A pílula do menu desliza até o item escolhido.
+- **Os botões são teclas**: cor chapada e uma borda de baixo que some quando a tecla desce. Sem degradê e sem brilho.
+- **As cores vêm do wallpaper.** Nenhuma cor é fixa no código: tudo sai das variáveis geradas pelo [Matugen](https://github.com/InioX/matugen) (veja [Tema](#tema-com-o-matugen)).
+- **Tipografia**: Space Grotesk para a interface e JetBrains Mono para nomes, versões e o terminal.
+
+### Leve de propósito
+
+O fundo e a transição são desenhados num Web Worker com `OffscreenCanvas`, fora da thread que carrega as páginas e responde aos cliques. A animação não disputa tempo com a interface, só redesenha os pixels que mudaram e para por completo quando a janela perde o foco. As fontes são servidas pelo próprio app, e listas longas só montam o que está na tela.
+
 ## Funcionalidades
 
-- Busca de pacotes da AUR com ordenação por correspondência e popularidade.
-- Navegação entre descoberta, busca, fila e atualizações.
-- Tela de detalhes com dependências, votos, mantenedor, link do projeto e PKGBUILD.
-- Instalação assíncrona usando `paru`.
-- Saída do build acompanhada em tempo real.
-- Cancelamento gracioso com `SIGINT`, permitindo que `paru` e `makepkg` limpem o processo.
-- Elevação de privilégios via `pkexec` e Polkit.
-- Tema personalizável por CSS, aplicado por cima da paleta base.
+- Busca local em SQLite com full-text na AUR, core e extra, ordenada por correspondência e popularidade.
+- Página do pacote com dependências, votos, mantenedor, link do projeto e PKGBUILD da AUR.
+- Instalação em fila com o `paru`, um pacote por vez, e a saída do build ao vivo.
+- Tema gerado a partir do wallpaper pelo Matugen.
+- Atalho <kbd>/</kbd> para ir direto à busca.
+- Movimento reduzido respeitado: as animações viram fades curtos e o fundo fica parado.
+
+### Em desenvolvimento
+
+- Cancelar uma instalação em andamento.
+- Telas de Instalados e Configurações (salvar preferências).
+- Atualizações e contagens lidas do sistema.
+- Ligar e desligar fontes de pacote pela barra lateral.
+- Rota de sincronização dos bancos (`/syncDb`) ligada à tecla "Sincronizar mirrors".
+- Builds com limite de CPU e memória, para um build pesado não travar a máquina.
 
 ## Stack
 
 | Camada | Tecnologia |
 | --- | --- |
 | Backend | Python + Flask |
-| Interface desktop | pywebview |
+| Interface desktop | pywebview (Qt WebEngine) |
 | Pacotes | paru, AUR e repositórios oficiais |
-| Dados | SQLite + busca full-text |
-| Estilo | HTML, CSS, Canvas em Web Worker, Space Grotesk e JetBrains Mono |
-| Privilégios | Polkit / `pkexec` |
+| Dados | SQLite + busca full-text (FTS5) |
+| Interface | HTML, CSS e JavaScript, sem framework; canvas num Web Worker |
+| Fontes | Space Grotesk e JetBrains Mono, servidas localmente |
 
 ## Rodando localmente
 
@@ -120,14 +140,27 @@ Abra a aplicação desktop:
 python app.py
 ```
 
-Para testar apenas as telas no navegador durante o desenvolvimento:
+Para testar só as telas no navegador durante o desenvolvimento:
 
 ```bash
 flask --app app:app run
 ```
 
+## Tema com o Matugen
+
+O Mosaic lê as cores de `~/.config/mosaic-store/colors.css`. Aponte um template do Matugen para esse arquivo:
+
+```toml
+# ~/.config/matugen/config.toml
+[templates.mosaic]
+input_path = "~/.config/matugen/templates/mosaic.css"
+output_path = "~/.config/mosaic-store/colors.css"
+```
+
+O template é um bloco `:root` com as variáveis de cor do app. A lista completa, com os valores padrão, está em [`static/css/theme.css`](static/css/theme.css). Sem o arquivo, o Mosaic usa esses valores padrão.
+
 ## Créditos
 
-O projeto nasceu como uma interface gráfica para o `paru`, com identidade própria e foco em tornar o fluxo da AUR mais compreensível.
+Space Grotesk e JetBrains Mono são distribuídas sob a SIL Open Font License 1.1 (licenças em [`static/fonts`](static/fonts)).
 
 O README anterior está preservado em [`README.before-showcase.md`](README.before-showcase.md).

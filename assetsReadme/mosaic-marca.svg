@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Mosaic">
+  <title>Mosaic</title>
+  <!-- A marca: quatro pacotes, um em cada cor do tema padrão. -->
+  <rect x="4" y="4" width="40" height="40" rx="4" fill="#86d7ac"/>
+  <rect x="52" y="4" width="40" height="40" rx="4" fill="#e9b9d3"/>
+  <rect x="4" y="52" width="40" height="40" rx="4" fill="#b5c5f9"/>
+  <rect x="52" y="52" width="40" height="40" rx="4" fill="#e6e0ec"/>
+</svg>
