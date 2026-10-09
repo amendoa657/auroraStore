@@ -1,115 +1,37 @@
-/* Camada viva da paleta.
+/* Nomes de apoio do visual.
 
-   Carregada DEPOIS do /tema.css (o arquivo gerado pelo Matugen), então tudo
-   aqui é recalculado a partir das cores do wallpaper — nenhuma cor fixa.
-   Os nomes base (--corDestaque, --corFundoCartao, …) continuam vindo do
-   Matugen; este arquivo só cria derivadas e mistura os acentos nas
-   superfícies para a interface não ficar cinza.
+   Carregado depois do /tema.css (o arquivo gerado pelo Matugen). Aqui não
+   tem cor nova nem mistura de tom: cada superfície aponta direto para a
+   variável correspondente do Matugen (ou do theme.css, quando o Matugen não
+   define), então a janela fica exatamente com as cores do wallpaper.
 
-   As misturas usam oklab: a cor resultante mantém a saturação em vez de
-   lavar para o cinza como acontece no srgb. */
+   Este arquivo também não redefine nenhuma variável do theme.css — as
+   derivadas (--corTextoSecundario, --corSeparador, …) continuam vindo de
+   lá ou do Matugen. */
 
 :root {
-  /* ---------- Texto ---------- */
-  --corTextoSecundario: color-mix(
-    in oklab,
-    color-mix(in oklab, var(--corTextoJanela) 86%, var(--corAcentoTerciario)) 80%,
-    transparent
-  );
-  --corTextoTerciario: color-mix(
-    in oklab,
-    color-mix(in oklab, var(--corTextoJanela) 80%, var(--corAcentoTerciario)) 64%,
-    transparent
-  );
-  --corSeparador: color-mix(in oklab, var(--corAcentoTerciario) 12%, transparent);
-  --corDecorativa: color-mix(
-    in oklab,
-    color-mix(in oklab, var(--corTextoJanela) 60%, var(--corAcentoTerciario)) 30%,
-    transparent
-  );
-  --corFocoContorno: var(--corDestaque);
-
-  /* ---------- Bordas ---------- */
-  --corBordaDestaque: color-mix(in oklab, var(--corDestaque) 48%, transparent);
-  --corBordaSecundaria: color-mix(in oklab, var(--corAcentoSecundario) 40%, transparent);
-  --corBordaTerciaria: color-mix(in oklab, var(--corAcentoTerciario) 22%, transparent);
-  --corBordaVidro: color-mix(in oklab, var(--corTextoJanela) 9%, transparent);
-
-  /* ---------- Fundos suaves dos acentos ---------- */
-  --corFundoDestaqueSuave: color-mix(in oklab, var(--corDestaque) 18%, transparent);
-  --corFundoSecundarioSuave: color-mix(in oklab, var(--corAcentoSecundario) 18%, transparent);
-  --corFundoTerciarioSuave: color-mix(in oklab, var(--corAcentoTerciario) 18%, transparent);
-  --corFundoDestrutivoSuave: color-mix(in oklab, var(--corFundoDestrutivo) 46%, transparent);
-  --corLuzMista: color-mix(in oklab, var(--corAcentoSecundario) 50%, var(--corAcentoTerciario));
-  --corLuzQuente: color-mix(in oklab, var(--corDestaque) 55%, var(--corAcentoSecundario));
-  --corBrilhoFundoPrimario: color-mix(in oklab, var(--corDestaque) 20%, transparent);
-  --corBrilhoFundoSecundario: color-mix(in oklab, var(--corAcentoSecundario) 24%, transparent);
-  --corBrilhoFundoTerciario: color-mix(in oklab, var(--corAcentoTerciario) 22%, transparent);
-  --corSombraColorida: color-mix(in oklab, var(--corAcentoTerciario) 30%, transparent);
-
-  /* ---------- Superfícies tingidas ----------
-     Os "containers" do Material You são escuros e saturados: misturados nas
-     superfícies neutras dão cor sem clarear demais. Todas opacas: o fundo
-     de pontos aparece só nos vãos entre os blocos. */
-  --superficieBase: color-mix(
-    in oklab,
-    var(--corFundoVisualizacao) 80%,
-    var(--corFundoAcentoTerciario)
-  );
-  --superficieJanela: color-mix(
-    in oklab,
-    var(--corFundoJanela) 82%,
-    var(--corFundoAcentoTerciario)
-  );
-  --superficieCabecalho: color-mix(
-    in oklab,
-    var(--corFundoBarraCabecalho) 82%,
-    var(--corFundoAcentoTerciario)
-  );
-  --superficieLateral: color-mix(
-    in oklab,
-    var(--corFundoBarraLateral) 84%,
-    var(--corFundoAcentoSecundario)
-  );
-  --superficieLateralSecundaria: color-mix(
-    in oklab,
-    var(--corFundoBarraLateralSecundaria) 78%,
-    var(--corFundoAcentoTerciario)
-  );
-  --superficieCartao: color-mix(
-    in oklab,
-    var(--corFundoCartao) 86%,
-    var(--corFundoAcentoTerciario)
-  );
-  --superficieCartaoHover: color-mix(
-    in oklab,
-    var(--corFundoCartao) 78%,
-    var(--corFundoAcentoSecundario)
-  );
-  --superficieElevada: color-mix(
-    in oklab,
-    var(--corFundoPopUp) 80%,
-    var(--corFundoAcentoTerciario)
-  );
-  --superficieElevadaHover: color-mix(
-    in oklab,
-    var(--corFundoPopUp) 66%,
-    var(--corFundoAcentoSecundario)
-  );
+  /* ---------- Superfícies ---------- */
+  --superficieBase: var(--corFundoVisualizacao);
+  --superficieJanela: var(--corFundoJanela);
+  --superficieCabecalho: var(--corFundoBarraCabecalho);
+  --superficieLateral: var(--corFundoBarraLateral);
+  --superficieLateralSecundaria: var(--corFundoBarraLateralSecundaria);
+  --superficieCartao: var(--corFundoCartao);
+  --superficieCartaoHover: var(--corFundoCartaoHover);
+  --superficieElevada: var(--corFundoPopUp);
+  --superficieElevadaHover: color-mix(in srgb, var(--corTextoJanela) 14%, var(--corFundoPopUp));
   --superficieLeitura: var(--superficieBase);
   --superficieFixa: var(--superficieBase);
-  --corFundoCartaoHover: var(--superficieCartaoHover);
 
-  /* Ícones de pacote sem imagem: trama tingida em vez de cinza. */
-  --corPlaceholderA: color-mix(in oklab, var(--corAcentoTerciario) 16%, var(--corFundoCartao));
-  --corPlaceholderB: color-mix(in oklab, var(--corAcentoTerciario) 7%, var(--corFundoCartao));
+  /* Contorno neutro dos blocos: o próprio texto da janela, bem fraco. */
+  --corBordaVidro: color-mix(in srgb, var(--corTextoJanela) 9%, transparent);
 
   /* ---------- Sombras ----------
      Sombra de objeto, não de luz: curta, escura e sem cor. */
-  --sombraCartao: 0 1px 0 color-mix(in oklab, var(--corTextoJanela) 5%, transparent) inset,
-    0 2px 0 color-mix(in oklab, var(--corFundoJanela) 70%, transparent);
-  --sombraCartaoHover: 0 1px 0 color-mix(in oklab, var(--corTextoJanela) 8%, transparent) inset,
-    0 4px 0 color-mix(in oklab, var(--corFundoJanela) 70%, transparent);
+  --sombraCartao: 0 1px 0 color-mix(in srgb, var(--corTextoJanela) 5%, transparent) inset,
+    0 2px 0 color-mix(in srgb, var(--corFundoJanela) 70%, transparent);
+  --sombraCartaoHover: 0 1px 0 color-mix(in srgb, var(--corTextoJanela) 8%, transparent) inset,
+    0 4px 0 color-mix(in srgb, var(--corFundoJanela) 70%, transparent);
 
   /* ---------- Movimento ----------
      Curvas fortes: ease-out para entrar/sair, ease-in-out para mover. */
@@ -121,27 +43,10 @@
   --dur-media: 240ms;
 }
 
-/* Versões saturadas dos acentos.
-   No esquema escuro o Material You entrega acentos pastel (pouca croma):
-   bonitos em texto, mas lavados quando viram luz de fundo. Aqui o matiz
-   continua o do wallpaper; só a croma sobe e a luminosidade fica numa
-   faixa que brilha sem estourar. Sem suporte a cor relativa, fica o pastel. */
-:root {
-  --vivoPrimario: var(--corDestaque);
-  --vivoSecundario: var(--corAcentoSecundario);
-  --vivoTerciario: var(--corAcentoTerciario);
-}
-@supports (color: oklch(from red l c h)) {
-  :root {
-    --vivoPrimario: oklch(from var(--corDestaque) clamp(0.66, l, 0.8) calc(c * 1.7 + 0.03) h);
-    --vivoSecundario: oklch(from var(--corAcentoSecundario) clamp(0.64, l, 0.78) calc(c * 1.8 + 0.03) h);
-    --vivoTerciario: oklch(from var(--corAcentoTerciario) clamp(0.64, l, 0.78) calc(c * 1.8 + 0.03) h);
-  }
-}
-
 /* Tons por pacote: o macro `icone` escolhe um a partir do nome, então cada
-   pacote mantém sempre a mesma cor. */
+   pacote mantém sempre a mesma cor. Os três acentos do Matugen, mais o
+   meio-termo entre secundário e terciário. */
 .tom-0 { --tom: var(--corDestaque); }
 .tom-1 { --tom: var(--corAcentoSecundario); }
 .tom-2 { --tom: var(--corAcentoTerciario); }
-.tom-3 { --tom: color-mix(in oklab, var(--corAcentoSecundario), var(--corAcentoTerciario)); }
+.tom-3 { --tom: var(--corLuzMista); }

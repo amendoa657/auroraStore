@@ -23,8 +23,8 @@
   const RAIO_LENTE = 150;
 
   /* ---------- Cores do tema ----------
-     As variáveis podem vir como color-mix() ou oklch(from …): um elemento de
-     prova deixa o navegador resolver e devolve a cor pronta. */
+     Um elemento de prova deixa o navegador resolver a variável (venha ela
+     em hex, rgb ou color-mix) e devolve a cor pronta para o canvas. */
   function resolverCor(variavel, reserva) {
     const prova = document.createElement("i");
     prova.style.cssText = `position:absolute;visibility:hidden;color:var(${variavel}, ${reserva})`;
@@ -34,17 +34,11 @@
     return cor;
   }
 
-  /* Confere se o canvas entende a cor; se não, usa a reserva em hex. */
-  function corUsavel(cor, reserva) {
-    ctx.fillStyle = "#000";
-    ctx.fillStyle = cor;
-    return ctx.fillStyle === "#000000" && cor !== "rgb(0, 0, 0)" ? reserva : cor;
-  }
-
+  /* Os três acentos do Matugen, sem ajuste nenhum. */
   const cores = [
-    corUsavel(resolverCor("--vivoPrimario", "#86d7ac"), resolverCor("--corDestaque", "#86d7ac")),
-    corUsavel(resolverCor("--vivoSecundario", "#e9b9d3"), resolverCor("--corAcentoSecundario", "#e9b9d3")),
-    corUsavel(resolverCor("--vivoTerciario", "#b5c5f9"), resolverCor("--corAcentoTerciario", "#b5c5f9")),
+    resolverCor("--corDestaque", "#86d7ac"),
+    resolverCor("--corAcentoSecundario", "#e9b9d3"),
+    resolverCor("--corAcentoTerciario", "#b5c5f9"),
   ];
   const corNeutra = resolverCor("--corTextoJanela", "#e6e0ec");
 

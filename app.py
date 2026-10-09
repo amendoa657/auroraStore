@@ -8,6 +8,7 @@ from flask import Flask
 
 from config.init import init
 from config.paru import criarConfigParu
+from config.qt import silenciarAvisosQt
 
 #from config.downloadFromMirrors import downloadAur
 from controllers.aurController import aurBp
@@ -47,5 +48,5 @@ if __name__ == "__main__":
     )
     #app.run(debug=True, use_reloader=False)
 
-
+    silenciarAvisosQt()
     webview.start(debug=False)

@@ -621,7 +621,7 @@ mark {
   color: var(--corTextoSucesso);
 }
 .btn-destrutivo {
-  --tecla: color-mix(in oklab, var(--corFundoDestrutivo) 70%, var(--superficieBase));
+  --tecla: var(--corFundoDestrutivoSuave);
   color: var(--corDestrutiva);
 }
 .btn-destrutivo:hover {
@@ -755,7 +755,7 @@ mark {
 .cartao-app:has(.tom-2),
 .item-fila:has(.tom-2) { --tom: var(--corAcentoTerciario); }
 .cartao-app:has(.tom-3),
-.item-fila:has(.tom-3) { --tom: color-mix(in oklab, var(--corAcentoSecundario), var(--corAcentoTerciario)); }
+.item-fila:has(.tom-3) { --tom: var(--corLuzMista); }
 .cartao-app h3 {
   margin: 0;
   font-size: 13.5px;
@@ -917,7 +917,7 @@ a.cartao:hover,
 .destaque-carrossel {
   position: relative;
 }
-/* O cartão grande da home: chapado no container secundário, com uma
+/* O cartão grande da home: no container secundário do Matugen, com uma
    retícula de pontos (a mesma do fundo) entrando pela direita. */
 .destaque {
   --tom: var(--corAcentoSecundario);
@@ -926,9 +926,9 @@ a.cartao:hover,
   padding: 22px;
   border-radius: 14px;
   background:
-    conic-gradient(at 3px 3px, transparent 75%, color-mix(in oklab, var(--vivoSecundario) 55%, transparent) 0)
+    conic-gradient(at 3px 3px, transparent 75%, color-mix(in srgb, var(--corAcentoSecundario) 45%, transparent) 0)
       0 0 / 9px 9px,
-    color-mix(in oklab, var(--corFundoAcentoSecundario) 46%, var(--superficieCartao));
+    var(--corFundoAcentoSecundario);
   border: 1px solid color-mix(in oklab, var(--corAcentoSecundario) 26%, transparent);
   box-shadow: var(--sombraCartao);
   position: relative;
@@ -944,7 +944,7 @@ a.cartao:hover,
   z-index: -1;
   background: linear-gradient(
     90deg,
-    color-mix(in oklab, var(--corFundoAcentoSecundario) 46%, var(--superficieCartao)) 45%,
+    var(--corFundoAcentoSecundario) 45%,
     transparent 100%
   );
   pointer-events: none;
@@ -1276,7 +1276,7 @@ a.cartao:hover,
   gap: 8px;
   flex-wrap: wrap;
   padding: 11px 18px;
-  background: color-mix(in oklab, var(--superficieBase) 86%, var(--corFundoAcentoSecundario));
+  background: var(--superficieLateralSecundaria);
   border-block: 1px solid var(--corBordaVidro);
   position: sticky;
   top: 0;
@@ -2129,7 +2129,7 @@ button.dep {
   border-radius: var(--raio-g);
   width: min(620px, calc(100vw - 40px));
   max-height: min(84vh, 760px);
-  background: color-mix(in oklab, var(--corFundoDialogo) 84%, var(--corFundoAcentoTerciario));
+  background: var(--corFundoDialogo);
   color: var(--corTextoDialogo);
   box-shadow:
     0 28px 80px rgba(0, 0, 0, 0.6),
