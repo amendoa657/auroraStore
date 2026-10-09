@@ -28,7 +28,7 @@
 
 Cada pacote é uma peça do mosaico. A marca são quatro blocos, um em cada cor do tema; atrás do conteúdo, uma grade de pixels em retícula muda de cor devagar, e a troca de tela é uma onda desses mesmos pixels saindo de onde foi o clique. Os botões são teclas: cor chapada e uma borda que some quando a tecla desce.
 
-As cores vêm do wallpaper, geradas pelo [Matugen](https://github.com/InioX/matugen) em `~/.config/aurora-store/colors.css` — nenhuma cor é fixa no código. Tipografia em **Space Grotesk** com **JetBrains Mono**, servidas pelo próprio app.
+As cores vêm do wallpaper, geradas pelo [Matugen](https://github.com/InioX/matugen) em `~/.config/mosaic-store/colors.css` — nenhuma cor é fixa no código. Tipografia em **Space Grotesk** com **JetBrains Mono**, servidas pelo próprio app.
 
 ## Telas
 

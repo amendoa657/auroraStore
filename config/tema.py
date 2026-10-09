@@ -2,7 +2,7 @@ from pathlib import Path
 
 from flask import abort, send_from_directory
 
-CONFIG_DIR = Path.home() / ".config" / "aurora-store"
+CONFIG_DIR = Path.home() / ".config" / "mosaic-store"
 
 def getTema():
     if not (CONFIG_DIR / "colors.css").is_file():

@@ -8,9 +8,9 @@ Sudo = pkexec
 
 
 def criarConfigParu():
-    caminho = Path.home() / ".config" / "aurora-store" / "paru.conf"
+    caminho = Path.home() / ".config" / "mosaic-store" / "paru.conf"
 
-    # Cria ~/.config/aurora-store caso ainda não exista.
+    # Cria ~/.config/mosaic-store caso ainda não exista.
     caminho.parent.mkdir(parents=True, exist_ok=True)
 
     # Não sobrescreve a configuração se ela já existir.
