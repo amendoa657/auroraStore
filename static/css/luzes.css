@@ -20,6 +20,26 @@
   height: 100%;
 }
 
+/* Cortina da transição entre páginas. Ocupa só a área de conteúdo (a
+   coluna do <main> na grade do .corpo): menu e cabeçalho ficam parados.
+   Nasce cobrindo tudo com a cor do fundo; o luzes.js desenha os pixels por
+   cima e tira essa cor no primeiro quadro. */
+.transicao-pixels {
+  display: none;
+  position: absolute;
+  inset: 0;
+  grid-column: -2 / -1;
+  grid-row: 1;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+}
+.revelando .transicao-pixels {
+  display: block;
+  background: var(--superficieBase);
+}
+
 /* Tudo que vem por cima do fundo. */
 .corpo > .barra-lateral,
 .corpo > .visualizacao {

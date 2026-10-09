@@ -418,38 +418,62 @@ mark {
   margin: 12px 4px;
 }
 
+/* ---------- Fontes ----------
+   Cada repositório é uma linha com um bloquinho na cor dele: aceso quando a
+   fonte está ligada, só o contorno quando está desligada. */
+.contagem-fontes {
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+.lista-fontes {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
 .fonte-repo {
+  --tom-fonte: var(--tom, var(--corAcentoTerciario));
   display: flex;
   align-items: center;
-  gap: 11px;
-  margin-top: 2px;
+  gap: 10px;
   width: 100%;
-  padding: 8px 12px;
+  padding: 7px 12px;
   border: 0;
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
-  background: var(--superficieLateralSecundaria);
-  color: var(--corTextoBarraLateralSecundaria);
+  background: transparent;
+  color: var(--corTextoTerciario);
   font-family: var(--fonteMono);
   font-weight: 500;
   font-size: 12px;
-  opacity: 0.55;
   transition:
-    opacity var(--dur-curta) ease,
     background var(--dur-curta) ease,
-    transform var(--dur-toque) var(--ease-out);
-}
-.fonte-repo.ligada {
-  opacity: 1;
-  background: var(--corFundoSecundarioSuave);
-  box-shadow: inset 0 0 0 1px var(--corBordaSecundaria);
+    color var(--dur-curta) ease;
 }
 .fonte-repo:hover {
-  background: var(--superficieElevadaHover);
+  background: var(--superficieLateralSecundaria);
+  color: var(--corTextoBarraLateral);
 }
-.fonte-repo:active {
-  transform: scale(0.97);
+.fonte-repo.ligada {
+  color: var(--corTextoBarraLateral);
+}
+.fonte-bloco {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tom-fonte) 55%, transparent);
+  transition:
+    background var(--dur-curta) ease,
+    box-shadow var(--dur-curta) ease,
+    transform var(--dur-toque) var(--ease-out);
+}
+.fonte-repo.ligada .fonte-bloco {
+  background: var(--tom-fonte);
+  box-shadow: none;
+}
+.fonte-repo:active .fonte-bloco {
+  transform: scale(0.8);
 }
 .fonte-repo .texto {
   flex: 1;
@@ -458,53 +482,84 @@ mark {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.fonte-repo .marca-check {
-  color: var(--corDestaque);
+.fonte-estado {
   flex: none;
-  width: 10px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--corTextoTerciario);
+}
+.fonte-repo.ligada .fonte-estado {
+  color: var(--tom-fonte);
 }
 
+/* ---------- Sincronizar mirrors ----------
+   Uma tecla larga no pé da barra lateral. Enquanto a rota /syncDb trabalha,
+   os quatro blocos giram um quarto de volta por vez. */
 .estado-sync {
   margin-top: auto;
-  padding: 11px 12px;
-  border: 0;
-  border-radius: 8px;
   width: 100%;
+  height: auto;
+  min-height: 46px;
+  padding: 8px 12px;
+  justify-content: flex-start;
+  gap: 11px;
   text-align: left;
-  cursor: pointer;
-  font: inherit;
-  background: var(--superficieLateralSecundaria);
-  color: var(--corTextoBarraLateralSecundaria);
-  transition:
-    background var(--dur-curta) ease,
-    transform var(--dur-toque) var(--ease-out);
+  border-radius: 9px;
 }
-.estado-sync:hover {
-  background: var(--superficieElevadaHover);
+.glifo-sync {
+  --bloco: 42%;
+  width: 16px;
+  height: 16px;
+  flex: none;
+  background:
+    linear-gradient(var(--corDestaque) 0 0) 0 0 / var(--bloco) var(--bloco),
+    linear-gradient(var(--corAcentoSecundario) 0 0) 100% 0 / var(--bloco) var(--bloco),
+    linear-gradient(var(--corAcentoTerciario) 0 0) 0 100% / var(--bloco) var(--bloco),
+    linear-gradient(var(--corTextoJanela) 0 0) 100% 100% / var(--bloco) var(--bloco);
+  background-repeat: no-repeat;
+  transition: transform 0.36s var(--ease-out);
 }
-.estado-sync:active {
-  transform: scale(0.98);
+.estado-sync:hover .glifo-sync {
+  transform: rotate(90deg);
 }
-.estado-sync .linha {
+.sync-texto {
   display: flex;
-  align-items: center;
-  gap: 7px;
-  font-family: var(--fonteMono);
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--corSucesso);
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.sync-texto .texto {
+  font-size: 12px;
+  font-weight: 600;
 }
 .estado-sync .detalhe-sync {
   font-family: var(--fonteMono);
-  font-size: 11px;
+  font-size: 10.5px;
+  font-weight: 500;
   color: var(--corTextoTerciario);
-  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.estado-sync.sincronizando {
+  pointer-events: none;
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--corTextoJanela) 4%, transparent),
+    0 0 0 transparent;
+}
+.estado-sync.sincronizando .glifo-sync {
+  animation: blocos-girando 1.6s infinite;
 }
 .estado-sync.sincronizando .texto::after {
   content: "…";
 }
-.estado-sync.sincronizando .pulso {
-  animation: girar 0.9s linear infinite;
+@keyframes blocos-girando {
+  0% { transform: rotate(0deg); animation-timing-function: var(--ease-in-out); }
+  25% { transform: rotate(90deg); animation-timing-function: var(--ease-in-out); }
+  50% { transform: rotate(180deg); animation-timing-function: var(--ease-in-out); }
+  75% { transform: rotate(270deg); animation-timing-function: var(--ease-in-out); }
+  100% { transform: rotate(360deg); }
 }
 .pulso {
   width: 6px;
@@ -2700,7 +2755,8 @@ button.dep {
   .item-lateral .contagem,
   .rotulo-secao,
   .fonte-repo .texto,
-  .estado-sync .detalhe-sync {
+  .fonte-estado,
+  .sync-texto {
     display: none;
   }
   .item-lateral .selo-contagem {
@@ -2715,9 +2771,6 @@ button.dep {
   .fonte-repo {
     justify-content: center;
     padding: 8px 0;
-  }
-  .fonte-repo .marca-check {
-    margin: 0;
   }
   .fonte-repo::before {
     content: attr(title);
@@ -2742,7 +2795,6 @@ button.dep {
   }
   .estado-sync {
     padding: 10px 0;
-    display: flex;
     justify-content: center;
   }
   .abas {
@@ -2790,10 +2842,13 @@ button.dep {
   }
   .item-lateral .texto,
   .item-lateral .contagem,
-  .rotulo-secao,
   .fonte-repo .texto,
-  .estado-sync .detalhe-sync {
+  .fonte-estado {
     display: block;
+  }
+  .rotulo-secao,
+  .sync-texto {
+    display: flex;
   }
   .item-lateral .texto {
     flex: 1;
@@ -2812,8 +2867,8 @@ button.dep {
     display: none;
   }
   .estado-sync {
-    display: block;
-    padding: 11px 12px;
+    justify-content: flex-start;
+    padding: 8px 12px;
   }
   .detalhe {
     display: block;

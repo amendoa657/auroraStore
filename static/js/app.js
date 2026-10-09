@@ -50,6 +50,58 @@ document.querySelectorAll("[data-enviar]").forEach((campo) => {
   campo.addEventListener("change", () => campo.form.submit());
 });
 
+/* 5. O X da busca. Com uma busca feita, ele é um link que limpa no servidor.
+      Antes de buscar, ele só aparece enquanto há texto e limpa o campo aqui
+      mesmo, sem recarregar. */
+document.querySelectorAll("[data-limpar-busca]").forEach((botao) => {
+  const campo = botao.closest("form").querySelector("input[type=search]");
+  const buscaFeita = !botao.hidden;
+
+  campo.addEventListener("input", () => {
+    if (!buscaFeita) botao.hidden = campo.value === "";
+  });
+
+  botao.addEventListener("click", (evento) => {
+    if (buscaFeita) return;
+    evento.preventDefault();
+    campo.value = "";
+    botao.hidden = true;
+    campo.focus();
+  });
+});
+
+/* 6. Sincronizar mirrors. A rota /syncDb demora (baixa os bancos inteiros):
+      a tecla fica afundada e os blocos girando até a resposta chegar. */
+document.querySelectorAll("[data-sincronizar]").forEach((formulario) => {
+  formulario.addEventListener("submit", () => {
+    const botao = formulario.querySelector("button");
+    botao.classList.add("sincronizando");
+    botao.setAttribute("aria-busy", "true");
+    formulario.querySelector("[data-rotulo-sync]").textContent = "Sincronizando";
+  });
+});
+
+/* 7. Origem da transição de pixels: ao sair da página, guarda onde foi o
+      último clique (se foi agora há pouco). A próxima página desfaz a
+      cortina a partir desse ponto — veja o <head> da base.html e o luzes.js. */
+let ultimoToque = null;
+document.addEventListener(
+  "pointerdown",
+  (evento) => {
+    ultimoToque = { x: evento.clientX, y: evento.clientY, t: Date.now() };
+  },
+  { capture: true, passive: true },
+);
+window.addEventListener("pagehide", () => {
+  const recente = ultimoToque && Date.now() - ultimoToque.t < 5000;
+  try {
+    sessionStorage.setItem(
+      "pixels:origem",
+      JSON.stringify(recente ? { x: ultimoToque.x, y: ultimoToque.y, t: Date.now() } : { t: Date.now() }),
+    );
+  } catch (erro) {}
+});
+
 /* A saída do build começa rolada até o fim, que é onde está o que interessa. */
 const terminal = document.querySelector(".terminal-saida");
 if (terminal) {

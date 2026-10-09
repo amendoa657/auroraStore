@@ -62,9 +62,11 @@
             <input class="campo-central" type="search" name="q" value="{{ termo or '' }}"
                    placeholder="Buscar pacotes" aria-label="Buscar pacotes"
                    autocomplete="off" spellcheck="false" autofocus>
-            {% if termo %}
-                <a class="btn-limpar" href="/buscar?modo={{ modo }}" aria-label="Limpar busca">✕</a>
-            {% endif %}
+            {# O `q=` vazio é o que faz o Flask esquecer a última pesquisa: sem ele
+               o controller cai de volta em ULTIMA_PESQUISA e a busca não some.
+               Sem busca feita, o X só aparece enquanto se digita (app.js). #}
+            <a class="btn-limpar" href="/buscar?q=&modo={{ modo }}" aria-label="Limpar busca"
+               data-limpar-busca {{ "hidden" if not termo }}>✕</a>
         </form>
 
         {# Trocar de modo é só recarregar a mesma busca com ?modo= diferente. #}

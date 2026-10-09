@@ -35,9 +35,12 @@
 {% if paleta %}<style>{{ paleta | safe }}</style>{% endif %}
 
 {#
-  Roda antes da primeira pintura: abrir de novo a mesma página (a fila se
-  recarrega sozinha a cada 2 s) não repete as entradas animadas nem a
-  transição entre páginas.
+  Roda antes da primeira pintura:
+    - abrir de novo a mesma página (a fila se recarrega sozinha a cada 2 s)
+      não repete as entradas animadas nem a transição entre páginas;
+    - vindo de outra página, liga a classe `revelando`: a cortina de pixels
+      já nasce cobrindo o conteúdo e o luzes.js a desfaz em onda a partir de
+      onde foi o clique (guardado pelo app.js ao sair da página anterior).
 #}
 <script>
   (function () {
@@ -49,6 +52,19 @@
       sessionStorage.setItem("aurora:ultima", aqui);
     } catch (erro) {}
     if (repeticao) raiz.classList.add("repeticao");
+
+    var origem = null;
+    try {
+      origem = JSON.parse(sessionStorage.getItem("pixels:origem"));
+      sessionStorage.removeItem("pixels:origem");
+    } catch (erro) {}
+    var calmo =
+      raiz.classList.contains("sem-animacoes") ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (origem && !repeticao && !calmo && Date.now() - origem.t < 3000) {
+      raiz.classList.add("revelando");
+      window.__origemPixels = origem;
+    }
 
     window.addEventListener("pagereveal", function (evento) {
       if (repeticao && evento.viewTransition) evento.viewTransition.skipTransition();
@@ -112,35 +128,56 @@
 
         {# Fontes de pacote. Cada uma é um botão que manda POST e o Python liga
            ou desliga; sem fonte nenhuma, o bloco some. #}
+        {# Fontes de pacote. Cada uma é um botão que manda POST e o Python liga
+           ou desliga; o bloquinho colorido acende quando a fonte está ligada.
+           Cada repositório tem sempre a mesma cor (as do tema). #}
         {% if fontes %}
+          {% set tons = {"core": 0, "extra": 2, "multilib": 3, "aur": 1} %}
           <div class="separador"></div>
-          <div class="rotulo-secao">FONTES</div>
+          <div class="rotulo-secao">
+            <span>FONTES</span>
+            <span class="contagem-fontes">{{ fontes | selectattr("ligada") | list | length }}/{{ fontes | length }}</span>
+          </div>
 
-          {% for fonte in fontes %}
-            <form class="form-acao" method="post" action="/fontes">
-              <input type="hidden" name="fonte" value="{{ fonte.id }}">
-              <button class="fonte-repo {{ 'ligada' if fonte.ligada }}" aria-pressed="{{ 'true' if fonte.ligada else 'false' }}">
-                <span class="texto">{{ fonte.rotulo }}</span>
-                <span class="marca-check" aria-hidden="true">{{ '✓' if fonte.ligada }}</span>
-              </button>
-            </form>
-          {% endfor %}
+          <div class="lista-fontes">
+            {% for fonte in fontes %}
+              <form class="form-acao" method="post" action="/fontes">
+                <input type="hidden" name="fonte" value="{{ fonte.id }}">
+                <button class="fonte-repo tom-{{ tons.get(fonte.id, 2) }} {{ 'ligada' if fonte.ligada }}"
+                        aria-pressed="{{ 'true' if fonte.ligada else 'false' }}"
+                        title="{{ fonte.rotulo }} — {{ 'ligada' if fonte.ligada else 'desligada' }}">
+                  <i class="fonte-bloco" aria-hidden="true"></i>
+                  <span class="texto">{{ fonte.rotulo }}</span>
+                  <span class="fonte-estado" aria-hidden="true">{{ "on" if fonte.ligada else "off" }}</span>
+                </button>
+              </form>
+            {% endfor %}
+          </div>
         {% endif %}
 
-        {% if sincronizado %}
-          <form class="form-acao" method="post" action="/sincronizar">
-            <button class="estado-sync" title="Sincronizar bancos de dados">
-              <div class="linha"><i class="pulso" aria-hidden="true"></i><span class="texto">sincronizado</span></div>
-              <div class="detalhe-sync">{{ sincronizado }}</div>
-            </button>
-          </form>
-        {% endif %}
+        {# Sincronizar mirrors: baixa de novo os bancos (core, extra, AUR).
+           Quem faz o trabalho é a rota POST /syncDb; `voltar` diz para onde
+           ela deve redirecionar quando terminar. Enquanto a resposta não
+           chega, o app.js deixa a tecla em estado "sincronizando". #}
+        <form class="form-acao" method="post" action="/syncDb" data-sincronizar>
+          <input type="hidden" name="voltar" value="{{ request.full_path.rstrip('?') }}">
+          <button class="btn estado-sync" title="Baixar de novo os bancos de core, extra e AUR">
+            <i class="glifo-sync" aria-hidden="true"></i>
+            <span class="sync-texto">
+              <span class="texto" data-rotulo-sync>Sincronizar mirrors</span>
+              <span class="detalhe-sync">{{ sincronizado or "core · extra · aur" }}</span>
+            </span>
+          </button>
+        </form>
       </nav>
     {% endblock %}
 
     <main class="visualizacao {% block classe_conteudo %}{% endblock %}">
       {% block conteudo %}{% endblock %}
     </main>
+
+    {# Cortina de pixels da transição entre páginas (luzes.js). #}
+    <canvas class="transicao-pixels" aria-hidden="true"></canvas>
 
     {# Fundo escuro atrás da gaveta do menu em telas estreitas. #}
     <div class="fundo-lateral" data-fechar-menu></div>

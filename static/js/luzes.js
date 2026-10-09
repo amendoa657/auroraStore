@@ -146,6 +146,109 @@
     requestAnimationFrame(laco);
   }
 
+  /* ---------- Transição entre páginas ----------
+     A página nova nasce com a cortina cobrindo o conteúdo (classe
+     `revelando`, posta no <head>). Aqui a cortina vira a mesma grade de
+     pixels do fundo e se desfaz numa onda que sai de onde foi o clique: cada
+     célula espera a onda chegar, acende na cor do campo daquele ponto e
+     encolhe até sumir. */
+  const ESPALHAR_MS = 300; // tempo para a onda atravessar a área
+  const ENCOLHER_MS = 190; // tempo de cada célula sumir
+
+  function revelar() {
+    const cortina = document.querySelector(".transicao-pixels");
+    if (!cortina) return;
+    const pincel = cortina.getContext("2d");
+    const caixa = cortina.getBoundingClientRect();
+    const larguraC = caixa.width;
+    const alturaC = caixa.height;
+    const escalaC = window.devicePixelRatio || 1;
+    cortina.width = Math.round(larguraC * escalaC);
+    cortina.height = Math.round(alturaC * escalaC);
+
+    /* Clique fora da área (no menu, por exemplo) também vale: a onda só
+       entra pela borda mais próxima. Sem clique (teclado), sai do centro. */
+    const origem = window.__origemPixels || {};
+    const ox = typeof origem.x === "number" ? origem.x - caixa.left : larguraC / 2;
+    const oy = typeof origem.y === "number" ? origem.y - caixa.top : alturaC / 2;
+    const alcance = Math.max(
+      Math.hypot(ox, oy),
+      Math.hypot(larguraC - ox, oy),
+      Math.hypot(ox, alturaC - oy),
+      Math.hypot(larguraC - ox, alturaC - oy),
+    );
+
+    const corCortina = resolverCor("--superficieBase", "#0f0d15");
+    const colunas = Math.ceil(larguraC / PASSO);
+    const linhas = Math.ceil(alturaC / PASSO);
+    const inicio = performance.now();
+    const t = Date.now() / 1000;
+
+    function quadro(agora) {
+      const decorrido = agora - inicio;
+      pincel.setTransform(escalaC, 0, 0, escalaC, 0, 0);
+      pincel.clearRect(0, 0, larguraC, alturaC);
+
+      const cheias = new Path2D();
+      const acesas = [new Path2D(), new Path2D(), new Path2D()];
+      let restantes = 0;
+
+      for (let j = 0; j < linhas; j += 1) {
+        for (let i = 0; i < colunas; i += 1) {
+          const x = i * PASSO;
+          const y = j * PASSO;
+          const cx = x + PASSO / 2;
+          const cy = y + PASSO / 2;
+          const atraso = (Math.hypot(cx - ox, cy - oy) / alcance) * ESPALHAR_MS;
+          const p = (decorrido - atraso) / ENCOLHER_MS;
+
+          if (p >= 1) continue;
+          restantes += 1;
+
+          if (p <= 0) {
+            /* +0.5 sobrepõe as vizinhas e esconde as frestas do antialias. */
+            cheias.rect(x, y, PASSO + 0.5, PASSO + 0.5);
+            continue;
+          }
+
+          let melhor = 0;
+          let forca = -Infinity;
+          for (let k = 0; k < 3; k += 1) {
+            const valor = campo(CAMPOS[k], cx, cy, t);
+            if (valor > forca) {
+              forca = valor;
+              melhor = k;
+            }
+          }
+          const saida = 1 - (1 - p) ** 3; // ease-out cúbico
+          const lado = (PASSO - 2) * (1 - saida);
+          acesas[melhor].rect(cx - lado / 2, cy - lado / 2, lado, lado);
+        }
+      }
+
+      pincel.fillStyle = corCortina;
+      pincel.fill(cheias);
+      for (let k = 0; k < 3; k += 1) {
+        pincel.fillStyle = cores[k];
+        pincel.fill(acesas[k]);
+      }
+
+      /* A cor sólida do CSS só segurava o primeiro quadro. */
+      cortina.style.background = "transparent";
+
+      if (restantes > 0) {
+        requestAnimationFrame(quadro);
+      } else {
+        raiz.classList.remove("revelando");
+        cortina.style.background = "";
+      }
+    }
+
+    quadro(inicio);
+  }
+
+  if (raiz.classList.contains("revelando")) revelar();
+
   medir();
   desenhar(performance.now());
 
