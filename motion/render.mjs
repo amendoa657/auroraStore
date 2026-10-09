@@ -1,6 +1,6 @@
 // Render do filme.
 //
-//   node render.mjs                 trilha + 1800 quadros -> ../resultados/01-teste.mp4
+//   node render.mjs                 trilha + 1800 quadros -> 01-teste.mp4 (nesta pasta)
 //   node render.mjs --folha         uma imagem por batida, em folhas de contato (build/folha-*.png)
 //   node render.mjs --quadro 13.2   um quadro em tamanho cheio (build/quadro-13.2.png)
 //
@@ -16,7 +16,7 @@ import { chromium } from "playwright-core";
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(AQUI, "..");
 const BUILD = path.join(AQUI, "build");
-const SAIDA = path.join(RAIZ, "resultados", "01-teste.mp4");
+const SAIDA = path.join(AQUI, "01-teste.mp4");
 const FPS = 60;
 const DURACAO = 30;
 const CHROME = process.env.CHROME || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
